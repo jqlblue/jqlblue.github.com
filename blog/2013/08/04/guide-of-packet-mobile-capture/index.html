@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
 <!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
@@ -30,7 +31,27 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+      rel="stylesheet" type="text/css">
+<script type="text/javascript">
+
+function addBlankTargetForLinks () {
+
+  $('a[href^="http"]').each(function(){
+
+      $(this).attr('target', '_blank');
+
+  });
+
+}
+
+$(document).bind('DOMNodeInserted', function(event) {
+
+  addBlankTargetForLinks();
+
+});
+
+</script>
 
   
 
@@ -60,6 +81,7 @@
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
 </ul>
 
 </nav>
@@ -178,22 +200,22 @@ fiddle抓包嘛，码农应该都知道</em>）。</p>
   <a href="http://wifi.360.cn/">官网</a>,因为不定期会在京东开启抢购。安装非常简
   单，插入usb接口，就自动创建好无线网络了（目前只支持windows系统）</p>
 
-<p>  <img src="http://i.niupic.com/images/2013/08/04/51ff38a1e7308.png" alt="wifi" />
-  <img src="http://i.niupic.com/images/2013/08/04/51ff38a8e36a8.png" alt="wifi" />
-  <img src="http://i.niupic.com/images/2013/08/04/51ff38b7ddda9.png" alt="wifi" /></p></li>
+<p>  <img src="http://imgdata.hoop8.com/1308/6921778608001.png" alt="wifi" />
+  <img src="http://imgdata.hoop8.com/1308/7001778608001.png" alt="wifi" />
+  <img src="http://imgdata.hoop8.com/1308/7091778608001.png" alt="wifi" /></p></li>
 <li><p>在电脑上用fiddle设置代理</p>
 
-<p>  <img src="http://i.niupic.com/images/2013/08/04/51ff3898ba348.png" alt="proxy fidlle" /></p></li>
+<p>  <img src="http://imgdata.hoop8.com/1308/6661778608001.png" alt="proxy fidlle" /></p></li>
 <li><p>修改手机上的网络设置，并设置代理</p>
 
-<p>  <img src="http://i.niupic.com/images/2013/08/04/51ff383ca6a42.png" alt="mobile network" />
-  <img src="http://i.niupic.com/images/2013/08/04/51ff38678bb71.png" alt="mobile network" />
-  <img src="http://i.niupic.com/images/2013/08/04/51ff388eb1e11.png" alt="mobile network" /></p>
+<p>  <img src="http://imgdata.hoop8.com/1308/5401778608001.png" alt="mobile network" />
+  <img src="http://imgdata.hoop8.com/1308/5501778608001.png" alt="mobile network" />
+  <img src="http://imgdata.hoop8.com/1308/6331778608001.png" alt="mobile network" /></p>
 
 <p>  代理服务器的ip可以通过在电脑上查看网络连接获取，代理的端口就是在
   fiddle中设置的&#8221;listen on port&#8221;</p>
 
-<p>  <img src="http://i.niupic.com/images/2013/08/04/51ff38817ae40.png" alt="mboile network" /></p></li>
+<p>  <img src="http://imgdata.hoop8.com/1308/5691778608001.png" alt="mboile network" /></p></li>
 </ul>
 
 </div>
@@ -275,9 +297,16 @@ var jiathis_config = {data_track_clickback:'true'};
 <aside class="sidebar">
   
     <section>
+  <h1>版权协议</h1>
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh"><img alt="知识共享许可协议" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/3.0/80x15.png" /></a><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh">知识共享署名-非商业性使用 3.0 未本地化版本许可协议</a>
+</section>
+<section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
+    <li class='category'><a href='/blog/categories/devops/'>devops (1)</a></li>
+<li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
 <li class='category'><a href='/blog/categories/network/'>network (1)</a></li>
 <li class='category'><a href='/blog/categories/php/'>php (3)</a></li>
 
@@ -286,6 +315,10 @@ var jiathis_config = {data_track_clickback:'true'};
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/18/an-introduction-to-systemtap/">An Introduction to Systemtap</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/08/10/php-5-dot-5-upgrade-guide/">Php 5.5 Upgrade Guide</a>
@@ -303,6 +336,13 @@ var jiathis_config = {data_track_clickback:'true'};
         <a href="/blog/2013/08/03/check-php5-dot-5-compatibility/">Check php5.5 Compatibility</a>
       </li>
     
+  </ul>
+</section>
+<section>
+  <h1>Tags</h1>
+  <ul class="tag-cloud">
+    <a style="font-size: NaN%" href="/tags/systemtap/">systemtap</a>
+
   </ul>
 </section>
 

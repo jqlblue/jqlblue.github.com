@@ -9,10 +9,10 @@
   <meta name="author" content="jqlblue">
 
   
-  <meta name="description" content="Blog Archive 2013 php 5.5 upgrade guide
+  <meta name="description" content="Blog Archive 2013 an introduction to systemtap
+Aug 18 2013 posted in devops php 5.5 upgrade guide
 Aug 10 2013 posted in php 移动应用无线抓包指南
-Aug 04 2013 posted in mobile, network broken pipe in php cli
-Aug 03 &hellip;">
+Aug 04 2013 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -31,7 +31,27 @@ Aug 03 &hellip;">
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+      rel="stylesheet" type="text/css">
+<script type="text/javascript">
+
+function addBlankTargetForLinks () {
+
+  $('a[href^="http"]').each(function(){
+
+      $(this).attr('target', '_blank');
+
+  });
+
+}
+
+$(document).bind('DOMNodeInserted', function(event) {
+
+  addBlankTargetForLinks();
+
+});
+
+</script>
 
   
 
@@ -61,6 +81,7 @@ Aug 03 &hellip;">
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
 </ul>
 
 </nav>
@@ -80,6 +101,20 @@ Aug 03 &hellip;">
 
   
   <h2>2013</h2>
+
+<article>
+  
+<h1><a href="/blog/2013/08/18/an-introduction-to-systemtap/">an introduction to systemtap</a></h1>
+<time datetime="2013-08-18T10:07:00+08:00" pubdate><span class='month'>Aug</span> <span class='day'>18</span> <span class='year'>2013</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/devops/'>devops</a></span>
+</footer>
+
+
+</article>
+
+
 
 <article>
   
@@ -145,9 +180,16 @@ Aug 03 &hellip;">
 <aside class="sidebar">
   
     <section>
+  <h1>版权协议</h1>
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh"><img alt="知识共享许可协议" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/3.0/80x15.png" /></a><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh">知识共享署名-非商业性使用 3.0 未本地化版本许可协议</a>
+</section>
+<section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
+    <li class='category'><a href='/blog/categories/devops/'>devops (1)</a></li>
+<li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
 <li class='category'><a href='/blog/categories/network/'>network (1)</a></li>
 <li class='category'><a href='/blog/categories/php/'>php (3)</a></li>
 
@@ -156,6 +198,10 @@ Aug 03 &hellip;">
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/18/an-introduction-to-systemtap/">An Introduction to Systemtap</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/08/10/php-5-dot-5-upgrade-guide/">Php 5.5 Upgrade Guide</a>
@@ -173,6 +219,13 @@ Aug 03 &hellip;">
         <a href="/blog/2013/08/03/check-php5-dot-5-compatibility/">Check php5.5 Compatibility</a>
       </li>
     
+  </ul>
+</section>
+<section>
+  <h1>Tags</h1>
+  <ul class="tag-cloud">
+    <a style="font-size: NaN%" href="/tags/systemtap/">systemtap</a>
+
   </ul>
 </section>
 

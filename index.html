@@ -9,9 +9,9 @@
   <meta name="author" content="jqlblue">
 
   
-  <meta name="description" content="前一阵子经常收到应用服务器的报警。登录服务器查看日志，netstat，strace
-看不出问题（道行不够）。然后restart之后，一切又都正常。 面对打着补丁的5.2，我们决定升级到php5.5 The reason 左右事物发展变化的，除了自身的能力和品质，有时跟环境的变迁，也有着莫大
-的关系 &hellip;">
+  <meta name="description" content="SystemTap is a tool for the Linux Operating System
+that allows developers and system administrators to deeply investigate
+the behavior of the kernel &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -30,7 +30,27 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+      rel="stylesheet" type="text/css">
+<script type="text/javascript">
+
+function addBlankTargetForLinks () {
+
+  $('a[href^="http"]').each(function(){
+
+      $(this).attr('target', '_blank');
+
+  });
+
+}
+
+$(document).bind('DOMNodeInserted', function(event) {
+
+  addBlankTargetForLinks();
+
+});
+
+</script>
 
   
 
@@ -60,6 +80,7 @@
 <ul class="main-navigation">
   <li><a href="/">Blog</a></li>
   <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
 </ul>
 
 </nav>
@@ -67,6 +88,121 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/18/an-introduction-to-systemtap/">An Introduction to Systemtap</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-18T10:07:00+08:00" pubdate data-updated="true">Aug 18<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><pre><code>SystemTap is a tool for the Linux Operating System
+that allows developers and system administrators to deeply investigate
+the behavior of the kernel and even user space applications
+in order to discover error conditions, performance issues,
+or just to understand how the system works, similarly to DTrace.
+</code></pre>
+
+<p>就像它的名字system（系统）tap（窃听），systemtap提供了底层的支持，以简
+化系统在运行时的信息收集（包括用户态和内核态的信息）。通过对收集到的
+信息进行分析，可以帮忙我们识别潜在的性能原因和功能问题。</p>
+
+<pre><code>systemtap不会直接告诉你程序哪里出了问题。但是在你对代码熟悉的情况下，可以用一成的功力使出七八成的效果
+</code></pre>
+
+<p>以往在收集这些信息时，我们需要添加检测点，重新编译，安装，重启使之生效。
+挺没意思的。。。</p>
+
+<p>使用systemtap就不需要了，我们只要编写相关脚本，并让systemtap的命令
+行接口stap（systemtap script translator/driver）进行调用就可以收集到用
+户空间和内核空间的相关信息。</p>
+
+<p>通过编写SystemTap脚本，我们就可以很容易地收集甚至篡改系统数据，这是普
+通的linux系统工具所做不到的。</p>
+
+<h3>相关背景知识</h3>
+
+<p>在Solaris系统上，有一个大名鼎鼎的动态跟踪工具
+<a href="http://en.wikipedia.org/wiki/DTrace">Dtrace</a>，这一个相当棒的工具（从
+2001年10月开始开发，在2005年1月首次发布），曾
+荣获《华尔街杂志》
+<a href="https://blogs.oracle.com/swan/date/20070307">2006技术创新大奖中的金奖</a>
+，和ZFS文件系统一样，DTrace一直都因版权问题而无法移植到Linux上，但
+Oracle（SUN公司被Oracle收购）在2012年2月宣布发布DTrace for Linux beta
+版，即将Solaris操作系统的动态跟踪工具移植到他们的Unbreakable
+Enterprise Kernel(2.6.39)内，也就是说Linux人员终于也可以使用DTrace了。</p>
+
+<p>在2005年1月开始，开源社区为linux操作系统开发了基于GPL许可的systemtap。</p>
+
+<p>目前一般的Linux发行版，比如Fedora、OpenSuse、CentOS等，已经包含有systemtap的完整支持了。</p>
+
+<h3>与其他trace工具比较</h3>
+
+<ul>
+<li>Dtrace：
+dtrace不用多说了，systemtap的开发，就是用来替代dtrace的，但是他们还
+是有以下几个明确的差异：
+
+<ol>
+<li>Dtrace不允许你任意地注入c代码，即在运行时修改系统数据，通过-g选项</li>
+<li>Dtrace脚本是以虚拟机字节码的形式在内核中进行解释，而systemtap脚本
+则是以本地二进制代码的形式被进行加载</li>
+</ol>
+</li>
+<li>strace：
+strace工作于用户态，只能用于处理系统调用</li>
+<li>ltrace：
+ltrace工作于用户态，只能用于处理用户态的函数</li>
+<li>gdb：
+gdb也工作于用户态，它的目标是进行交互式的调试</li>
+</ul>
+
+
+<p>更多信息请参见：<a href="http://sourceware.org/systemtap/wiki/SystemtapDtraceComparison">SystemtapDtraceComparison</a></p>
+
+<p>而systemtap作为一个通用工具，通过追踪（tracing），可以了解：</p>
+
+<pre><code>在一段时间内，某进程执行了哪些系统调用以及次数
+一个函数执行了多长时间
+进程函数调用栈并使用相关工具生成火焰图 (Flame Graph)
+甚至可以使用systemtap脚本进行任意发挥
+</code></pre>
+
+<p>reference:
+<a href="http://sourceware.org/systemtap/langref/SystemTap_overview.html#SECTION00021000000000000000">http://sourceware.org/systemtap/langref/SystemTap_overview.html#SECTION00021000000000000000</a>
+<a href="http://raisama.net/talks/fisl10/kernel-hacking/stap.pdf">http://raisama.net/talks/fisl10/kernel-hacking/stap.pdf</a>
+<a href="http://cheeselee.fedorapeople.org/systemtap-robin-20130817.pdf">http://cheeselee.fedorapeople.org/systemtap-robin-20130817.pdf</a>
+<a href="http://agentzh.org/misc/slides/yapc-na-2013-flame-graphs.pdf">http://agentzh.org/misc/slides/yapc-na-2013-flame-graphs.pdf</a>
+<a href="http://www.linuxfoundation.jp/jp_uploads/seminar20090225/obata.pdf">http://www.linuxfoundation.jp/jp_uploads/seminar20090225/obata.pdf</a>
+<a href="http://dtrace.org/blogs/brendan/2011/10/15/using-systemtap/">http://dtrace.org/blogs/brendan/2011/10/15/using-systemtap/</a>
+<a href="http://lenky.info/2013/02/04/systemtap%E5%88%9D%E8%AF%95%E7%94%A8/">http://lenky.info/2013/02/04/systemtap%E5%88%9D%E8%AF%95%E7%94%A8/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -708,9 +844,16 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
 <aside class="sidebar">
   
     <section>
+  <h1>版权协议</h1>
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh"><img alt="知识共享许可协议" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/3.0/80x15.png" /></a><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh">知识共享署名-非商业性使用 3.0 未本地化版本许可协议</a>
+</section>
+<section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
+    <li class='category'><a href='/blog/categories/devops/'>devops (1)</a></li>
+<li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
 <li class='category'><a href='/blog/categories/network/'>network (1)</a></li>
 <li class='category'><a href='/blog/categories/php/'>php (3)</a></li>
 
@@ -719,6 +862,10 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/08/18/an-introduction-to-systemtap/">An Introduction to Systemtap</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/08/10/php-5-dot-5-upgrade-guide/">Php 5.5 Upgrade Guide</a>
@@ -736,6 +883,13 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
         <a href="/blog/2013/08/03/check-php5-dot-5-compatibility/">Check php5.5 Compatibility</a>
       </li>
     
+  </ul>
+</section>
+<section>
+  <h1>Tags</h1>
+  <ul class="tag-cloud">
+    <a style="font-size: NaN%" href="/tags/systemtap/">systemtap</a>
+
   </ul>
 </section>
 
