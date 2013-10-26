@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[高原的 Blog]]></title>
+  <title><![CDATA[atom.]]></title>
   <link href="http://jqlblue.github.io/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2013-08-31T10:34:31+08:00</updated>
+  <updated>2013-10-26T15:56:11+08:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[在fedora上安装fcitx输入法和云拼音]]></title>
+    <link href="http://jqlblue.github.io/blog/2013/10/26/fcitx-fedora/"/>
+    <updated>2013-10-26T12:30:00+08:00</updated>
+    <id>http://jqlblue.github.io/blog/2013/10/26/fcitx-fedora</id>
+    <content type="html"><![CDATA[<p>从fedora18开始，ibus感觉渐渐不如以前好用了，尤其是在emacs下使用的时候，经过死机。restart input method是家常便饭。</p>
+
+<p>一次发现同事的ubuntu上在使用google输入法，让我眼前一亮。但是在64位的fedora19上没有配置成功。于是尝试了下fcitx输入法，特此记录。</p>
+
+<h3>安装步骤</h3>
+
+<figure class='code'><figcaption><span>fcitx install step </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install fcitx.x86_64
+</span><span class='line'>yum install fcitx-configtool.x86_64
+</span><span class='line'>yum install fcitx-gtk3.x86_64
+</span><span class='line'>yum install fcitx-cloudpinyin.x86_64
+</span><span class='line'>yum install fcitx-table-chinese.noarch
+</span><span class='line'>yum intall fcitx-qt4.x86_64
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置</h3>
+
+<p>编辑~/.bashrc，添加：</p>
+
+<pre><code>export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+</code></pre>
+
+<p>重启系统或者logout，使之生效。</p>
+
+<pre><code>如果将im_module设置为xim，系统重启时可能会造成应用程序卡死。
+此时可以通过键盘快捷键“CTRL+ALT+F2”，切换成tty2，
+通过console模式登录系统杀死fcitx进程，再切回X window，或者直接重启。
+</code></pre>
+
+<h3>相关设置</h3>
+
+<p>如下图所示：</p>
+
+<pre><code>1. 在“input method”Tab，可以添加或者删除输入法
+2. “Global Config”Tab，主要用于设置相关快捷键
+3. “Appearance”列用于设置输入法弹出框的显示界面
+4. 点击“Addon”Tab，通过Cloud Pinyin可以设置云拼音。即可以将谷歌拼音，搜狗，百度，QQ输入法的内容合并进来。
+   下图的设置，是当输入第二个词的时候，将云拼音的结果合并到第二个位置。
+</code></pre>
+
+<p><img src="http://jqlblue.github.io/images/fcitx_config.png" title="'fcitx_config images'" >
+<img src="http://jqlblue.github.io/images/fcitx_config_cloud_pinyin.png" title="'fcitx_config_cloud_pinyin images'" ></p>
+
+<p>reference：</p>
+
+<blockquote><p><a href="https://wiki.archlinux.org/index.php/Fcitx">Fcitx</a></p></blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[九月[september]]]></title>
@@ -481,22 +544,22 @@ fiddle抓包嘛，码农应该都知道</em>）。</p>
   <a href="http://wifi.360.cn/">官网</a>,因为不定期会在京东开启抢购。安装非常简
   单，插入usb接口，就自动创建好无线网络了（目前只支持windows系统）</p>
 
-<p>  <img src="http://imgdata.hoop8.com/1308/6921778608001.png" alt="wifi" />
-  <img src="http://imgdata.hoop8.com/1308/7001778608001.png" alt="wifi" />
-  <img src="http://imgdata.hoop8.com/1308/7091778608001.png" alt="wifi" /></p></li>
+<p>  <img src="http://jqlblue.github.io/images/360wifi_1.png" title="'360 wifi images'" >
+  <img src="http://jqlblue.github.io/images/360wifi_2.png" title="'360 wifi images'" >
+  <img src="http://jqlblue.github.io/images/360wifi_3.png" title="'360 wifi images'" ></p></li>
 <li><p>在电脑上用fiddle设置代理</p>
 
-<p>  <img src="http://imgdata.hoop8.com/1308/6661778608001.png" alt="proxy fidlle" /></p></li>
+<p>  <img src="http://jqlblue.github.io/images/360wifi_fiddle.png" title="'360 wifiproxy fidlle images'" ></p></li>
 <li><p>修改手机上的网络设置，并设置代理</p>
 
-<p>  <img src="http://imgdata.hoop8.com/1308/5401778608001.png" alt="mobile network" />
-  <img src="http://imgdata.hoop8.com/1308/5501778608001.png" alt="mobile network" />
-  <img src="http://imgdata.hoop8.com/1308/6331778608001.png" alt="mobile network" /></p>
+<p>  <img src="http://jqlblue.github.io/images/360wifi_proxy_1.png" title="'360 wifi mobile network" >
+  <img src="http://jqlblue.github.io/images/360wifi_proxy_2.png" title="'360 wifi mobile network" >
+  <img src="http://jqlblue.github.io/images/360wifi_proxy_3.png" title="'360 wifi mobile network" ></p>
 
 <p>  代理服务器的ip可以通过在电脑上查看网络连接获取，代理的端口就是在
   fiddle中设置的&#8221;listen on port&#8221;</p>
 
-<p>  <img src="http://imgdata.hoop8.com/1308/5691778608001.png" alt="mboile network" /></p></li>
+<p>  <img src="http://jqlblue.github.io/images/360wifi_proxy_ip.png" title="'360 wifi mobile network" ></p></li>
 </ul>
 
 ]]></content>
