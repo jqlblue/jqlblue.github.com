@@ -9,7 +9,9 @@
   <meta name="author" content="jqlblue">
 
   
-  <meta name="description" content="从fedora18开始，ibus感觉渐渐不如以前好用了，尤其是在emacs下使用的时候，经过死机。restart input method是家常便饭。 一次发现同事的ubuntu上在使用google输入法，让我眼前一亮。但是在64位的fedora19上没有配置成功。于是尝试了下fcitx输入法， &hellip;">
+  <meta name="description" content="前面的话 涉及软件： virtualenv (http://www.virtualenv.org/en/latest/)
+virtualenvwrapper (http://pypi.python.org/pypi/virtualenvwrapper/)
+pythonbrew (http:// &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +88,241 @@ $(document).bind('DOMNodeInserted', function(event) {
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/06/python-dev-env/">Python开发环境搭建</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-06T17:32:00+08:00" pubdate data-updated="true">Nov 6<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>前面的话</h3>
+
+<p>涉及软件：</p>
+
+<pre><code>virtualenv (http://www.virtualenv.org/en/latest/)
+virtualenvwrapper (http://pypi.python.org/pypi/virtualenvwrapper/)
+pythonbrew (http://pythonbrew.readthedocs.org/en/latest/index.html)
+</code></pre>
+
+<p>virtualenv用于在一台机器上创建多个独立的python运行环境。</p>
+
+<p>virtualenvwrapper对virtualenv进行了封装，并提供了一些便利的命令行工具。通过virtualenv可以方便的创建一个隔离的python环境，即所谓的沙盒。</p>
+
+<p>沙盒的好处包括：</p>
+
+<pre><code>1 解决库之间的版本依赖，比如同一系统上不同应用依赖同一个库的不同版本。
+2 解决权限限制，比如你没有root权限。
+3 可以尝试新的工具，而不用担心污染系统环境。
+</code></pre>
+
+<p>pythonbrew是一个python多版本管理利器。</p>
+
+<h3>安装和使用</h3>
+
+<h5>pythonbrew</h5>
+
+<ul>
+<li>安装：</li>
+</ul>
+
+
+<p>使用easy_install</p>
+
+<pre><code>$ easy_install pythonbrew
+$ pythonbrew_install
+</code></pre>
+
+<p>ps：安装python-setuptools后就会有easy_install。</p>
+
+<p>或手动下载</p>
+
+<pre><code>$ curl -kLO http://github.com/utahta/pythonbrew/raw/master/pythonbrew-install
+$ chmod +x pythonbrew-install
+$ ./pythonbrew-install
+</code></pre>
+
+<p>然后在 ~/.bashrc 文件追加下面这一行:</p>
+
+<pre><code>[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] &amp;&amp; source "$HOME/.pythonbrew/etc/bashrc"
+</code></pre>
+
+<p>并在终端执行：</p>
+
+<pre><code>source ~/.bashrc
+</code></pre>
+
+<p>通过设置PYTHONBREW_ROOT环境变量，可以将pythonbrew安装到指定目录:</p>
+
+<pre><code>$ export PYTHONBREW_ROOT=/path_to/pythonbrew
+$ curl -kLO http://github.com/utahta/pythonbrew/raw/master/pythonbrew-install
+$ chmod +x pythonbrew-install
+$ ./pythonbrew-install
+</code></pre>
+
+<p>然后在 ~/.bashrc 文件追加下面这一行:</p>
+
+<pre><code>[[ -s "/path_to/pythonbrew/etc/bashrc" ]] &amp;&amp; source "/path_to/pythonbrew/etc/bashrc"
+export PYTHONBREW_ROOT=/path_to/pythonbrew
+export PYTHONBREW_HOME=/path_to/pythonbrew
+
+if [ -f $PYTHONBREW_HOME/etc/current ]; then
+. $PYTHONBREW_HOME/etc/current
+fi
+
+export PATH=$PATH_PYTHONBREW_CURRENT:${PATH}
+</code></pre>
+
+<ul>
+<li>使用：</li>
+</ul>
+
+
+<p>安装版本：</p>
+
+<pre><code>$ pythonbrew install 2.7.3
+</code></pre>
+
+<p>安装日志在&#8221;$PYTHONBREW_HOME/log/build.log&#8221;</p>
+
+<p>如果出现“CompressionError: bz2 module is not available”。需要在安装时增加编译参数 pythonbrew install &mdash;configure=&ldquo;&mdash;with-bz2&rdquo; 2.7.3</p>
+
+<p>安装之前，需要先安装bzip2，openssl</p>
+
+<pre><code>sudo yum install bzip2-devel
+sudo yum install openssl-devel.x86_64
+</code></pre>
+
+<p>选择版本：</p>
+
+<pre><code>$ pythonbrew switch 2.7.3
+</code></pre>
+
+<p>查看版本：</p>
+
+<pre><code>$ pythonbrew list       # 列出目前已安装的版本
+$ pythonbrew list -k  # 列出可以下载和安装的版本
+</code></pre>
+
+<p>卸载版本：</p>
+
+<pre><code>$ pythonbrew uninstall 2.7.3
+
+$ pythonbrew install 2.7.3  #安装特定版本
+$ pythonbrew use 2.7.3     #在此次shell中应用特定版本
+$ pythonbrew switch 2.7.3 #永久切换至特定版本
+$ pythonbrew py FILE #临时用某版本执行FILE
+$ pythonbrew off  #关闭pythonbrew，使用系统自带的python
+</code></pre>
+
+<p>更多使用方法请移步 <a href="http://pythonbrew.readthedocs.org/en/latest/index.html">http://pythonbrew.readthedocs.org/en/latest/index.html</a></p>
+
+<h5>virtualenv</h5>
+
+<ul>
+<li>安装：</li>
+</ul>
+
+
+<p>命令行执行</p>
+
+<pre><code>$ pip install virtualenv
+</code></pre>
+
+<ul>
+<li>使用：</li>
+</ul>
+
+
+<p>建立新的运行环境：virtualenv</p>
+
+<p>进入相应的独立沙盒环境：source /bin/activate</p>
+
+<p>退出相应的独立沙盒环境：deactivate</p>
+
+<p>如：</p>
+
+<pre><code>$ virtualenv ~/code/test1
+$ source ~/code/test1/bin/activate
+</code></pre>
+
+<p>这时，终端会变成下面这样：</p>
+
+<pre><code>(test1)xx@localhost ~$
+</code></pre>
+
+<p>更多使用方法请移步 <a href="http://www.virtualenv.org/en/latest/">http://www.virtualenv.org/en/latest/</a></p>
+
+<h5>virtualenvwrapper</h5>
+
+<ul>
+<li>安装：</li>
+</ul>
+
+
+<p>命令行执行</p>
+
+<pre><code>$ pip install virtualenvwrapper
+</code></pre>
+
+<ul>
+<li>使用：</li>
+</ul>
+
+
+<p>激活创建的工作环境</p>
+
+<pre><code>$ export WORKON_HOME=~/envs
+$ mkdir $WORKON_HOME
+$ source /usr/bin/virtualenvwrapper.sh
+$ mkvirtualenv test
+New python executable in test/bin/python
+Installing setuptools............done.
+Installing pip...............done.
+virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/predeactivate
+virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/preactivate
+virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/postactivate
+virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/get_env_details
+(test)xx@localhost envs$ 
+</code></pre>
+
+<p>reference：</p>
+
+<p>[^1] <a href="http://blog.caokee.com/2012/02/pythons-virtual-environment-and-multi-version-programming-tools-virtualenv-and-pythonbrew.html">http://blog.caokee.com/2012/02/pythons-virtual-environment-and-multi-version-programming-tools-virtualenv-and-pythonbrew.html</a></p>
+
+<p>[^2] <a href="http://www.virtualenv.org/en/latest">http://www.virtualenv.org/en/latest</a></p>
+
+<p>[^3] <a href="http://www.v2ex.com/t/42760">http://www.v2ex.com/t/42760</a></p>
+
+<p>[^4] <a href="http://chenxiaoyu.org/2011/04/03/multi-python-manage-pythonbrew.html">http://chenxiaoyu.org/2011/04/03/multi-python-manage-pythonbrew.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -641,6 +878,46 @@ PHP 5.5 vs 5.3 improve 39% (708-507)/507=0.3964497041
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2013/08/09/php-5-dot-5-upgrade-guide/">Php 5.5 Upgrade Guide</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-09T23:04:00+08:00" pubdate data-updated="true">Aug 9<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>The reason</h3>
+
+<p>人实际上是一种非常厉害的生物。只要给他一个足够的理由，</p>
+
+<h3>how</h3>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2013/08/04/guide-of-packet-mobile-capture/">移动应用无线抓包指南</a></h1>
     
     
@@ -1037,18 +1314,23 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/blog/categories/devops/'>devops (1)</a></li>
+    <li class='category'><a href='/blog/categories/devops/'>devops (2)</a></li>
 <li class='category'><a href='/blog/categories/essay/'>essay (1)</a></li>
 <li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
 <li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
 <li class='category'><a href='/blog/categories/network/'>network (1)</a></li>
-<li class='category'><a href='/blog/categories/php/'>php (3)</a></li>
+<li class='category'><a href='/blog/categories/php/'>php (4)</a></li>
+<li class='category'><a href='/blog/categories/python/'>python (1)</a></li>
 
   </ul>
 </section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/06/python-dev-env/">Python开发环境搭建</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/10/26/fcitx-fedora/">在fedora上安装fcitx输入法和云拼音</a>
@@ -1064,10 +1346,6 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
     
       <li class="post">
         <a href="/blog/2013/08/10/php-5-dot-5-upgrade-guide/">Php 5.5 Upgrade Guide</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/08/04/guide-of-packet-mobile-capture/">移动应用无线抓包指南</a>
       </li>
     
   </ul>
