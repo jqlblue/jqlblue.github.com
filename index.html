@@ -9,9 +9,11 @@
   <meta name="author" content="jqlblue">
 
   
-  <meta name="description" content="前面的话 涉及软件： virtualenv (http://www.virtualenv.org/en/latest/)
-virtualenvwrapper (http://pypi.python.org/pypi/virtualenvwrapper/)
-pythonbrew (http:// &hellip;">
+  <meta name="description" content="最近在项目中使用了鸟哥的yar扩展，但是在php5.2.10环境中没有安装成功，所以将php升级到了5.5。 升级步骤 安装php5.5.0
+检测代码兼容性
+从线上服务器日志中收集最热的一百条访问日志
+下线一台服务器，启动php5.5环境，根据日志中最热的请求进行重放
+检测服务器日志进行改进 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -94,7 +96,7 @@ $(document).bind('DOMNodeInserted', function(event) {
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/11/06/python-dev-env/">Python开发环境搭建</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/11/16/pdo-mysql-escape-string/">在php5.5中使用pdo和mysql_escape_string的一个坑</a></h1>
     
     
       <p class="meta">
@@ -110,213 +112,62 @@ $(document).bind('DOMNodeInserted', function(event) {
   
 
 
-<time datetime="2013-11-06T17:32:00+08:00" pubdate data-updated="true">Nov 6<span>th</span>, 2013</time>
+<time datetime="2013-11-16T18:04:00+08:00" pubdate data-updated="true">Nov 16<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h3>前面的话</h3>
+  <div class="entry-content"><p>最近在项目中使用了鸟哥的yar扩展，但是在php5.2.10环境中没有安装成功，所以将php升级到了5.5。</p>
 
-<p>涉及软件：</p>
-
-<pre><code>virtualenv (http://www.virtualenv.org/en/latest/)
-virtualenvwrapper (http://pypi.python.org/pypi/virtualenvwrapper/)
-pythonbrew (http://pythonbrew.readthedocs.org/en/latest/index.html)
-</code></pre>
-
-<p>virtualenv用于在一台机器上创建多个独立的python运行环境。</p>
-
-<p>virtualenvwrapper对virtualenv进行了封装，并提供了一些便利的命令行工具。通过virtualenv可以方便的创建一个隔离的python环境，即所谓的沙盒。</p>
-
-<p>沙盒的好处包括：</p>
-
-<pre><code>1 解决库之间的版本依赖，比如同一系统上不同应用依赖同一个库的不同版本。
-2 解决权限限制，比如你没有root权限。
-3 可以尝试新的工具，而不用担心污染系统环境。
-</code></pre>
-
-<p>pythonbrew是一个python多版本管理利器。</p>
-
-<h3>安装和使用</h3>
-
-<h5>pythonbrew</h5>
+<h3>升级步骤</h3>
 
 <ul>
-<li>安装：</li>
+<li>安装php5.5.0</li>
+<li>检测代码兼容性</li>
+<li>从线上服务器日志中收集最热的一百条访问日志</li>
+<li>下线一台服务器，启动php5.5环境，根据日志中最热的请求进行重放</li>
+<li>检测服务器日志进行改进</li>
 </ul>
 
 
-<p>使用easy_install</p>
+<p>升级过程很顺利，但是上线后在日志中发现如下信息：</p>
 
-<pre><code>$ easy_install pythonbrew
-$ pythonbrew_install
+<pre><code>mysql_escape_string(): This function is deprecated; use mysql_real_escape_string() instead
 </code></pre>
 
-<p>ps：安装python-setuptools后就会有easy_install。</p>
+<p>于是顺手修复上线。鉴于最近没怎么写代码，手有点生，先发布到了测试环境测试没问题才上线。</p>
 
-<p>或手动下载</p>
+<p>就在去茶水间接了一杯水的当儿，运营反馈说线上页面显示异常。于是马上回滚代码。</p>
 
-<pre><code>$ curl -kLO http://github.com/utahta/pythonbrew/raw/master/pythonbrew-install
-$ chmod +x pythonbrew-install
-$ ./pythonbrew-install
+<p>问题代码如下：</p>
+
+<pre><code>$db = getDb();
+$a = mysql_real_escape_string($keyword);
+$sql = 'select info from table where keyword = ' . $a;
+$res = $db-&gt;getRow($sql);
 </code></pre>
 
-<p>然后在 ~/.bashrc 文件追加下面这一行:</p>
+<p>通过调试，发现：</p>
 
-<pre><code>[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] &amp;&amp; source "$HOME/.pythonbrew/etc/bashrc"
+<pre><code>$keyword在mysql_real_escape_string处理之后，变成了false，所以在进行后面的查询时获取不到相应结果，页面就异常了。
 </code></pre>
 
-<p>并在终端执行：</p>
+<p>再进一步调试发现：</p>
 
-<pre><code>source ~/.bashrc
+<pre><code>getDb使用的是pdo。
+$dbh = new PDO('mysql:host=xxx;port=xxx;dbname=xxx', 'xxx', 'xxx');
 </code></pre>
 
-<p>通过设置PYTHONBREW_ROOT环境变量，可以将pythonbrew安装到指定目录:</p>
+<p>于是原因浮出水面</p>
 
-<pre><code>$ export PYTHONBREW_ROOT=/path_to/pythonbrew
-$ curl -kLO http://github.com/utahta/pythonbrew/raw/master/pythonbrew-install
-$ chmod +x pythonbrew-install
-$ ./pythonbrew-install
+<pre><code>1 在使用string mysql_real_escape_string时没有指定link_identifier
+2 所以会去找使用mysql_connect()打开的最后一个连接
+3 使用的是pdo，没有找到相关连接。于是尝试使用不带任何参数的mysql_connect()去建立一个连接来使用
+4 本机没有mysql server，自然建立连接失败。于是发生错误，并产生警告信息（E_WARNING）
+5 服务器上设置的错误报告等级已经屏蔽了E_WARNING，所以也没有监控到相关错误
 </code></pre>
-
-<p>然后在 ~/.bashrc 文件追加下面这一行:</p>
-
-<pre><code>[[ -s "/path_to/pythonbrew/etc/bashrc" ]] &amp;&amp; source "/path_to/pythonbrew/etc/bashrc"
-export PYTHONBREW_ROOT=/path_to/pythonbrew
-export PYTHONBREW_HOME=/path_to/pythonbrew
-
-if [ -f $PYTHONBREW_HOME/etc/current ]; then
-. $PYTHONBREW_HOME/etc/current
-fi
-
-export PATH=$PATH_PYTHONBREW_CURRENT:${PATH}
-</code></pre>
-
-<ul>
-<li>使用：</li>
-</ul>
-
-
-<p>安装版本：</p>
-
-<pre><code>$ pythonbrew install 2.7.3
-</code></pre>
-
-<p>安装日志在&#8221;$PYTHONBREW_HOME/log/build.log&#8221;</p>
-
-<p>如果出现“CompressionError: bz2 module is not available”。需要在安装时增加编译参数 pythonbrew install &mdash;configure=&ldquo;&mdash;with-bz2&rdquo; 2.7.3</p>
-
-<p>安装之前，需要先安装bzip2，openssl</p>
-
-<pre><code>sudo yum install bzip2-devel
-sudo yum install openssl-devel.x86_64
-</code></pre>
-
-<p>选择版本：</p>
-
-<pre><code>$ pythonbrew switch 2.7.3
-</code></pre>
-
-<p>查看版本：</p>
-
-<pre><code>$ pythonbrew list       # 列出目前已安装的版本
-$ pythonbrew list -k  # 列出可以下载和安装的版本
-</code></pre>
-
-<p>卸载版本：</p>
-
-<pre><code>$ pythonbrew uninstall 2.7.3
-
-$ pythonbrew install 2.7.3  #安装特定版本
-$ pythonbrew use 2.7.3     #在此次shell中应用特定版本
-$ pythonbrew switch 2.7.3 #永久切换至特定版本
-$ pythonbrew py FILE #临时用某版本执行FILE
-$ pythonbrew off  #关闭pythonbrew，使用系统自带的python
-</code></pre>
-
-<p>更多使用方法请移步 <a href="http://pythonbrew.readthedocs.org/en/latest/index.html">http://pythonbrew.readthedocs.org/en/latest/index.html</a></p>
-
-<h5>virtualenv</h5>
-
-<ul>
-<li>安装：</li>
-</ul>
-
-
-<p>命令行执行</p>
-
-<pre><code>$ pip install virtualenv
-</code></pre>
-
-<ul>
-<li>使用：</li>
-</ul>
-
-
-<p>建立新的运行环境：virtualenv</p>
-
-<p>进入相应的独立沙盒环境：source /bin/activate</p>
-
-<p>退出相应的独立沙盒环境：deactivate</p>
-
-<p>如：</p>
-
-<pre><code>$ virtualenv ~/code/test1
-$ source ~/code/test1/bin/activate
-</code></pre>
-
-<p>这时，终端会变成下面这样：</p>
-
-<pre><code>(test1)xx@localhost ~$
-</code></pre>
-
-<p>更多使用方法请移步 <a href="http://www.virtualenv.org/en/latest/">http://www.virtualenv.org/en/latest/</a></p>
-
-<h5>virtualenvwrapper</h5>
-
-<ul>
-<li>安装：</li>
-</ul>
-
-
-<p>命令行执行</p>
-
-<pre><code>$ pip install virtualenvwrapper
-</code></pre>
-
-<ul>
-<li>使用：</li>
-</ul>
-
-
-<p>激活创建的工作环境</p>
-
-<pre><code>$ export WORKON_HOME=~/envs
-$ mkdir $WORKON_HOME
-$ source /usr/bin/virtualenvwrapper.sh
-$ mkvirtualenv test
-New python executable in test/bin/python
-Installing setuptools............done.
-Installing pip...............done.
-virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/predeactivate
-virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/postdeactivate
-virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/preactivate
-virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/postactivate
-virtualenvwrapper.user_scripts creating /home/xx/envs/test/bin/get_env_details
-(test)xx@localhost envs$ 
-</code></pre>
-
-<p>reference：</p>
-
-<p>[^1] <a href="http://blog.caokee.com/2012/02/pythons-virtual-environment-and-multi-version-programming-tools-virtualenv-and-pythonbrew.html">http://blog.caokee.com/2012/02/pythons-virtual-environment-and-multi-version-programming-tools-virtualenv-and-pythonbrew.html</a></p>
-
-<p>[^2] <a href="http://www.virtualenv.org/en/latest">http://www.virtualenv.org/en/latest</a></p>
-
-<p>[^3] <a href="http://www.v2ex.com/t/42760">http://www.v2ex.com/t/42760</a></p>
-
-<p>[^4] <a href="http://chenxiaoyu.org/2011/04/03/multi-python-manage-pythonbrew.html">http://chenxiaoyu.org/2011/04/03/multi-python-manage-pythonbrew.html</a></p>
 </div>
   
   
@@ -1319,8 +1170,7 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
 <li class='category'><a href='/blog/categories/linux/'>linux (1)</a></li>
 <li class='category'><a href='/blog/categories/mobile/'>mobile (1)</a></li>
 <li class='category'><a href='/blog/categories/network/'>network (1)</a></li>
-<li class='category'><a href='/blog/categories/php/'>php (4)</a></li>
-<li class='category'><a href='/blog/categories/python/'>python (1)</a></li>
+<li class='category'><a href='/blog/categories/php/'>php (5)</a></li>
 
   </ul>
 </section>
@@ -1329,7 +1179,7 @@ SIGPIPE信号，所以grep会继续向broke pipe（读端关闭）写入，于�
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/11/06/python-dev-env/">Python开发环境搭建</a>
+        <a href="/blog/2013/11/16/pdo-mysql-escape-string/">在php5.5中使用pdo和mysql_escape_string的一个坑</a>
       </li>
     
       <li class="post">
