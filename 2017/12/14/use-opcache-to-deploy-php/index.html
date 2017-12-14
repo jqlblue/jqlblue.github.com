@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>基于Opcache发布php项目 - Debug Hacks</title>
+
+  <meta name="author" content="jqlblue">
+  
+  <meta name="description" content="如何基于php的Opcache发布php代码">
+  <meta name="keywords" content="deploy php project use opcache，代码发布，Persistent secondary file-based cache for OPCache">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jqlblue.github.io/2017/12/14/use-opcache-to-deploy-php">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  
+  <link href="/atom.xml" rel="alternate" title="Debug Hacks" type="application/atom+xml">
+
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+
+
+  <script type="text/javascript">
+    jQuery.noConflict();
+  </script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<!--<link href="http://fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">-->
+<!--<link href="http://fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">-->
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-49934763-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?d2b96656c83497acc0d393854dba07cb";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Debug Hacks</a></h1>
+  
+    <h2>谦虚其心，宏大其量.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:jqlblue.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="https://github.com/jqlblue" target="_blank">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">基于Opcache发布php项目</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-12-14T11:17:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2017</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>php的<code>Opcache</code>已经release好多年了，现在基本都是php的标配。最近看到了php创始人<code>Rasmus Lerdorf</code>的一篇<a href="http://talks.php.net/confoo16#/">talk</a>，于是有了使用php的opcache发布代码的想法。</p>
+
+<!-- more -->
+
+
+<h1>Opcache</h1>
+
+<p><code>Opcache</code>也叫<code>Zend OPcache</code>，其前身是Zend公司开发的闭源PHP优化加速组件<code>Optimizer+</code>。于2013年3月中旬改名为<code>Opcache</code>，并开源。</p>
+
+<p>在2013年6月发布的php5.5.0版本中，整合了<code>Opcache</code>。</p>
+
+<p><a href="https://pecl.php.net/package/ZendOpcache">pecl</a>上的<code>Opcache</code>扩展，于2015-01-12转正。</p>
+
+<p><code>OPcache</code>通过将 PHP 脚本预编译的字节码存储到共享内存(或者文件)中来提升 PHP 的性能， 存储预编译字节码的好处就是 省去了每次加载和解析 PHP 脚本的开销。不过<code>OPcache</code> 没有象 APC 那样的 user cache 功能。</p>
+
+<p><img src="/images/opcache/php_lifecycle_opcache.png" title="PHP script lifecycle" ></p>
+
+<h1>Opcache使用</h1>
+
+<p>php5.5及以上版本已经整合了<code>Opcache</code>，只需要在编译php时添加</p>
+
+<pre><code>--enable-opcache --enable-opcache-file
+</code></pre>
+
+<p>即可为php添加opcache扩展，然后修改<code>php.ini</code>，主动开启<code>Opcache</code></p>
+
+<pre><code>zend_extension="/path/opcache.so"
+[opcache]
+opcache.enable=1
+opcache.enable_cli=1
+</code></pre>
+
+<p>之后运行php程序时，会生成<code>Opcache</code>，下次运行时可以直接加载，免去了词法分析，语法分析，以及解析php脚本花费的时间。</p>
+
+<p><code>Opcache</code>默认存储在php进程的共享内存中，不过也可以存储到本地文件中。性能的差异大致如下：</p>
+
+<p><img src="/images/opcache/secondary_file-based_cache.png" title="Persistent secondary file-based cache for OPCache" ></p>
+
+<p>看完这张图，突然有种脑洞大开的感觉。</p>
+
+<p>发布php时，预先生成opcache-file，只发布opcache，是否可行呢？</p>
+
+<h1>使用Opcache发布php</h1>
+
+<p>开启<code>Opcache</code>后，可以使用<code>opcache_compile_file</code>生成php的opcache-file。涉及<code>php.ini</code>中的如下配置参数</p>
+
+<pre><code>opcache.max_accelerated_files=20000
+opcache.file_cache=/data/php/opcache
+opcache.file_cache_only=0
+opcache.validate_timestamps=0
+opcache.save_comments=0
+</code></pre>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">function</span> <span class="nf">opcache_compile_files</span><span class="p">(</span><span class="nv">$dir</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">foreach</span><span class="p">(</span><span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="k">new</span> <span class="nx">RecursiveDirectoryIterator</span><span class="p">(</span><span class="nv">$dir</span><span class="p">))</span> <span class="k">as</span> <span class="nv">$v</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$v</span><span class="o">-&gt;</span><span class="na">isDir</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;%\.php$%&#39;</span><span class="p">,</span> <span class="nv">$v</span><span class="o">-&gt;</span><span class="na">getRealPath</span><span class="p">()))</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$v</span><span class="o">-&gt;</span><span class="na">getRealPath</span><span class="p">();</span>
+</span><span class='line'>            <span class="nx">opcache_compile_file</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>            <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">echo</span> <span class="nv">$file</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">opcache_compile_files</span><span class="p">(</span><span class="s1">&#39;/path/project/foo&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在命令行下执行上述脚本，即可遍历整个项目，生成对应php的opcache-file，同时会清空原php文件的内容。</p>
+
+<p>如：</p>
+
+<pre><code>ls /data/php/opcache/4d400aec8fadf667fabe41a87f30f7cc
+
+/data/php/opcache/4d400aec8fadf667fabe41a87f30f7cc/path/project/app/Utility.php.bin
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>1. 生成opcache-file时，需要设置opcache.file_cache_only=0
+</span><span class='line'>2. 需要保持原有项目的目录结构和文件 -- 内容可以清空，使opcache-file生效</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">jqlblue</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-12-14T11:17:00+08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2017</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/categories/php/'>php</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+  
+     <style>
+.flash-video {
+    display:none;
+}
+</style>
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style_32x32">
+	<a class="jiathis_button_tsina"></a>
+	<a class="jiathis_button_weixin"></a>
+	<a href="http://www.jiathis.com/share?uid=1823276" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+var jiathis_config = {data_track_clickback:'true'};
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1359039158528928" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+<div id="uyan_frame"></div>
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=1823276"></script>
+
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2017/01/05/2fa-a-programmers-perspective/" title="Previous Post: 深入理解双因子认证">&laquo; 深入理解双因子认证</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>版权协议</h1>
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh"><img alt="知识共享许可协议" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/3.0/80x15.png" /></a><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/deed.zh">知识共享署名-非商业性使用 3.0 未本地化版本许可协议</a>
+</section>
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/categories/collect/'>collect (6)</a></li>
+<li class='category'><a href='/categories/devops/'>devops (9)</a></li>
+<li class='category'><a href='/categories/emacs/'>emacs (1)</a></li>
+<li class='category'><a href='/categories/essay/'>essay (3)</a></li>
+<li class='category'><a href='/categories/linux/'>linux (3)</a></li>
+<li class='category'><a href='/categories/mind/'>mind (4)</a></li>
+<li class='category'><a href='/categories/mobile/'>mobile (3)</a></li>
+<li class='category'><a href='/categories/network/'>network (1)</a></li>
+<li class='category'><a href='/categories/php/'>php (9)</a></li>
+
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2017/12/14/use-opcache-to-deploy-php/">基于Opcache发布php项目</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2017/01/05/2fa-a-programmers-perspective/">深入理解双因子认证</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/12/31/writing-in-2016-of-mine/">我的2016和很多书写体验</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/11/17/mac-terminal-cross-gfw/">Mac终端穿墙技术汇总</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2016/07/01/charles-https/">使用charles在移动设备上捕获https数据包</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Tags</h1>
+  <ul class="tag-cloud">
+    <a style="font-size: 128%" href="/tags/collect/">collect</a>
+<a style="font-size: 210%" href="/tags/devops/">devops</a>
+<a style="font-size: 150%" href="/tags/essay/">essay</a>
+<a style="font-size: 196%" href="/tags/linux/">linux</a>
+<a style="font-size: 166%" href="/tags/mind/">mind</a>
+<a style="font-size: 150%" href="/tags/mobile/">mobile</a>
+<a style="font-size: 128%" href="/tags/monitor/">monitor</a>
+<a style="font-size: 188%" href="/tags/php/">php</a>
+<a style="font-size: 166%" href="/tags/php5-dot-5/">php5.5</a>
+<a style="font-size: 128%" href="/tags/web/">web</a>
+
+  </ul>
+</section>
+
+<section>
+    <h1>新浪微博</h1>
+    <ul id="weibo">
+    <li>
+<iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1282083982&verifier=f2e5e0d3&dpc=1"></iframe>
+      </li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - jqlblue -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+
+<script src="/javascripts/libs/jquery.1.7.1.min.js" type="text/javascript"></script>
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+
+
+<script src="/javascripts/libs/jquery.tableofcontents.min.js" type="text/javascript"></script>
+<script src="/javascripts/libs/generate-toc.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+
+$(document).bind('DOMNodeInserted', function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+
+
+
+</body>
+</html>

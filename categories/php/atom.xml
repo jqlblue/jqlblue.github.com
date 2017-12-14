@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/categories/php/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2017-01-10T23:38:13+08:00</updated>
+  <updated>2017-12-14T16:11:01+08:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -12,6 +12,102 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[基于Opcache发布php项目]]></title>
+    <link href="http://jqlblue.github.io/2017/12/14/use-opcache-to-deploy-php/"/>
+    <updated>2017-12-14T11:17:00+08:00</updated>
+    <id>http://jqlblue.github.io/2017/12/14/use-opcache-to-deploy-php</id>
+    <content type="html"><![CDATA[<p>php的<code>Opcache</code>已经release好多年了，现在基本都是php的标配。最近看到了php创始人<code>Rasmus Lerdorf</code>的一篇<a href="http://talks.php.net/confoo16#/">talk</a>，于是有了使用php的opcache发布代码的想法。</p>
+
+<!-- more -->
+
+
+<h1>Opcache</h1>
+
+<p><code>Opcache</code>也叫<code>Zend OPcache</code>，其前身是Zend公司开发的闭源PHP优化加速组件<code>Optimizer+</code>。于2013年3月中旬改名为<code>Opcache</code>，并开源。</p>
+
+<p>在2013年6月发布的php5.5.0版本中，整合了<code>Opcache</code>。</p>
+
+<p><a href="https://pecl.php.net/package/ZendOpcache">pecl</a>上的<code>Opcache</code>扩展，于2015-01-12转正。</p>
+
+<p><code>OPcache</code>通过将 PHP 脚本预编译的字节码存储到共享内存(或者文件)中来提升 PHP 的性能， 存储预编译字节码的好处就是 省去了每次加载和解析 PHP 脚本的开销。不过<code>OPcache</code> 没有象 APC 那样的 user cache 功能。</p>
+
+<p>{% img /images/opcache/php_lifecycle_opcache.png PHP script lifecycle %}</p>
+
+<h1>Opcache使用</h1>
+
+<p>php5.5及以上版本已经整合了<code>Opcache</code>，只需要在编译php时添加</p>
+
+<pre><code>--enable-opcache --enable-opcache-file
+</code></pre>
+
+<p>即可为php添加opcache扩展，然后修改<code>php.ini</code>，主动开启<code>Opcache</code></p>
+
+<pre><code>zend_extension="/path/opcache.so"
+[opcache]
+opcache.enable=1
+opcache.enable_cli=1
+</code></pre>
+
+<p>之后运行php程序时，会生成<code>Opcache</code>，下次运行时可以直接加载，免去了词法分析，语法分析，以及解析php脚本花费的时间。</p>
+
+<p><code>Opcache</code>默认存储在php进程的共享内存中，不过也可以存储到本地文件中。性能的差异大致如下：</p>
+
+<p>{% img /images/opcache/secondary_file-based_cache.png Persistent secondary file-based cache for OPCache %}</p>
+
+<p>看完这张图，突然有种脑洞大开的感觉。</p>
+
+<p>发布php时，预先生成opcache-file，只发布opcache，是否可行呢？</p>
+
+<h1>使用Opcache发布php</h1>
+
+<p>开启<code>Opcache</code>后，可以使用<code>opcache_compile_file</code>生成php的opcache-file。涉及<code>php.ini</code>中的如下配置参数</p>
+
+<pre><code>opcache.max_accelerated_files=20000
+opcache.file_cache=/data/php/opcache
+opcache.file_cache_only=0
+opcache.validate_timestamps=0
+opcache.save_comments=0
+</code></pre>
+
+<p>{% codeblock lang:php %}</p>
+
+<p>function opcache_compile_files($dir) {</p>
+
+<pre><code>foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $v) {
+    if(!$v-&gt;isDir() &amp;&amp; preg_match('%\.php$%', $v-&gt;getRealPath())) {
+        $file = $v-&gt;getRealPath();
+        opcache_compile_file($file);
+        file_put_contents($file, '');
+        echo $file . "\n";
+    }
+}
+</code></pre>
+
+<p>}</p>
+
+<p>opcache_compile_files(&lsquo;/path/project/foo&rsquo;);
+{% endcodeblock %}</p>
+
+<p>在命令行下执行上述脚本，即可遍历整个项目，生成对应php的opcache-file，同时会清空原php文件的内容。</p>
+
+<p>如：</p>
+
+<pre><code>ls /data/php/opcache/4d400aec8fadf667fabe41a87f30f7cc
+
+/data/php/opcache/4d400aec8fadf667fabe41a87f30f7cc/path/project/app/Utility.php.bin
+</code></pre>
+
+<p>```</p>
+
+<pre><code>1. 生成opcache-file时，需要设置opcache.file_cache_only=0
+2. 需要保持原有项目的目录结构和文件 -- 内容可以清空，使opcache-file生效
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[一周打造支付系统]]></title>
@@ -811,66 +907,6 @@ $ ll -h /usr/local/php5-static/bin/php
 <p>[^3] <a href="http://www.gnu.org/software/libtool/manual/html_node/Link-mode.html">http://www.gnu.org/software/libtool/manual/html_node/Link-mode.html</a></p>
 
 <p>[^4] <a href="http://markmail.org/message/cpoenglavs4vwv32">http://markmail.org/message/cpoenglavs4vwv32</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[在php5.5中使用pdo和mysql_escape_string的一个坑]]></title>
-    <link href="http://jqlblue.github.io/2013/11/16/pdo-mysql-escape-string/"/>
-    <updated>2013-11-16T18:04:00+08:00</updated>
-    <id>http://jqlblue.github.io/2013/11/16/pdo-mysql-escape-string</id>
-    <content type="html"><![CDATA[<p>最近在项目中使用了鸟哥的yar扩展，但是在php5.2.10环境中没有安装成功，所以将php升级到了5.5。</p>
-
-<!-- more -->
-
-
-<h3>升级步骤</h3>
-
-<ul>
-<li>安装php5.5.0</li>
-<li>检测代码兼容性</li>
-<li>从线上服务器日志中收集最热的一百条访问日志</li>
-<li>下线一台服务器，启动php5.5环境，根据日志中最热的请求进行重放</li>
-<li>检测服务器日志进行改进</li>
-</ul>
-
-
-<p>升级过程很顺利，但是上线后在日志中发现如下信息：</p>
-
-<pre><code>mysql_escape_string(): This function is deprecated; use mysql_real_escape_string() instead
-</code></pre>
-
-<p>于是顺手修复上线。鉴于最近没怎么写代码，手有点生，先发布到了测试环境测试没问题才上线。</p>
-
-<p>就在去茶水间接了一杯水的当儿，运营反馈说线上页面显示异常。于是马上回滚代码。</p>
-
-<p>问题代码如下：</p>
-
-<pre><code>$db = getDb();
-$a = mysql_real_escape_string($keyword);
-$sql = 'select info from table where keyword = ' . $a;
-$res = $db-&gt;getRow($sql);
-</code></pre>
-
-<p>通过调试，发现：</p>
-
-<pre><code>$keyword在mysql_real_escape_string处理之后，变成了false，所以在进行后面的查询时获取不到相应结果，页面就异常了。
-</code></pre>
-
-<p>再进一步调试发现：</p>
-
-<pre><code>getDb使用的是pdo。
-$dbh = new PDO('mysql:host=xxx;port=xxx;dbname=xxx', 'xxx', 'xxx');
-</code></pre>
-
-<p>于是原因浮出水面</p>
-
-<pre><code>1 在使用string mysql_real_escape_string时没有指定link_identifier
-2 所以会去找使用mysql_connect()打开的最后一个连接
-3 使用的是pdo，没有找到相关连接。于是尝试使用不带任何参数的mysql_connect()去建立一个连接来使用
-4 本机没有mysql server，自然建立连接失败。于是发生错误，并产生警告信息（E_WARNING）
-5 服务器上设置的错误报告等级已经屏蔽了E_WARNING，所以也没有监控到相关错误
-</code></pre>
 ]]></content>
   </entry>
   
