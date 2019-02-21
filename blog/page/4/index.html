@@ -98,7 +98,7 @@ var _hmt = _hmt || [];
       
   <header>
     
-      <h1 class="entry-title"><a href="/2014/10/01/use-graphite-and-alter-build-monitor-system/">使用graphite和cabot搭建监控服务</a></h1>
+      <h1 class="entry-title"><a href="/2014/04/09/statically-compile-php/">如何静态编译php</a></h1>
     
     
       <p class="meta">
@@ -114,20 +114,22 @@ var _hmt = _hmt || [];
   
 
 
-<time datetime="2014-10-01T09:43:00+08:00" pubdate data-updated="true">Oct 1<span>st</span>, 2014</time>
+<time datetime="2014-04-09T18:13:00+08:00" pubdate data-updated="true">Apr 9<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>说起监控，我们一般会首先想到<code>zabbix</code>，<code>nagios</code>，<code>ganglia</code>等等。但是对于非<code>ops</code>开发人员而言，这些东西，多多少少让人感到陌生。所以本文将从一个<code>服务端开发人员</code>的视角，介绍如何通过<code>graphite</code>，<code>cabot</code>，加一个<code>shell</code>定时脚本，搭建监控报警服务。</p>
+  <div class="entry-content"><p>有些时候，我们写了一个php脚本，但是对方的服务器上没有php环境。</p>
+
+<p>这时，我们可以通过静态方式编译php，并将相关扩展一起打包进php可执行文件，然后在运行脚本时指定php binary。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/2014/10/01/use-graphite-and-alter-build-monitor-system/">Read on &rarr;</a>
+      <a rel="full-article" href="/2014/04/09/statically-compile-php/">Read on &rarr;</a>
     </footer>
   
 
@@ -139,7 +141,7 @@ var _hmt = _hmt || [];
       
   <header>
     
-      <h1 class="entry-title"><a href="/2014/09/22/e-commerce-idea-collection/">电商相关概念整理</a></h1>
+      <h1 class="entry-title"><a href="/2014/03/29/read-wirite-on-linux-file-system/">Linux文件系统如何进行文件存取</a></h1>
     
     
       <p class="meta">
@@ -155,22 +157,35 @@ var _hmt = _hmt || [];
   
 
 
-<time datetime="2014-09-22T10:24:00+08:00" pubdate data-updated="true">Sep 22<span>nd</span>, 2014</time>
+<time datetime="2014-03-29T13:32:00+08:00" pubdate data-updated="true">Mar 29<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>电子商务模式</h2>
+  <div class="entry-content"><p>乍一看，这个题目好像有点小儿科。</p>
 
-<p>电子商务模式是指企业运用互联网，通过基于一定技术基础的商务运作方式开展经营取得营业收入的基本方式。</p>
+<p>写文件嘛</p>
+
+<pre><code>echo hello &gt; /tmp/foo
+</code></pre>
+
+<p>读文件嘛</p>
+
+<pre><code>cat /tmp/foo
+</code></pre>
+
+<p>对于普通文件的存取，的确可以使用上面的方法。但是在linux操作系统上，一
+切都是文件。除了<code>普通文件</code>，还包括：<code>目录</code>，<code>符号链接</code>，<code>IPC Endpoints</code>（如pipe，unix socket）和<code>设备文件</code>(块设备，字符设备)。</p>
+
+<p>当然，本文的重点不在于介绍相关操作技巧，而是希望可以探寻操作背后的机制。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/2014/09/22/e-commerce-idea-collection/">Read on &rarr;</a>
+      <a rel="full-article" href="/2014/03/29/read-wirite-on-linux-file-system/">Read on &rarr;</a>
     </footer>
   
 
@@ -182,7 +197,7 @@ var _hmt = _hmt || [];
       
   <header>
     
-      <h1 class="entry-title"><a href="/2014/08/02/synchronization-user-account-on-linux/">在linux服务器之间同步用户账号</a></h1>
+      <h1 class="entry-title"><a href="/2014/02/28/emacs24-on-mac-and-linux/">在mac系统上使用emacs24打造web开发环境</a></h1>
     
     
       <p class="meta">
@@ -198,20 +213,20 @@ var _hmt = _hmt || [];
   
 
 
-<time datetime="2014-08-02T17:26:00+08:00" pubdate data-updated="true">Aug 2<span>nd</span>, 2014</time>
+<time datetime="2014-02-28T14:16:00+08:00" pubdate data-updated="true">Feb 28<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>最近负责运帷的同事离职了，原先由运帷可以一手搞定的事情，分摊到了几个研发同事的身上。但是多人公用一个账号，实在感觉不爽。</p>
+  <div class="entry-content"><p>Emacs 是一个强大的、可扩展的文本编辑器。不同于vim，它是一个流行的无模式文本编辑器。尤其是当emacs24内置包管理elpa后，使用通过<code>prelude</code>，<code>goblin</code>等，轻松使用emacs打造一个顺手的diy的web开发环境。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/2014/08/02/synchronization-user-account-on-linux/">Read on &rarr;</a>
+      <a rel="full-article" href="/2014/02/28/emacs24-on-mac-and-linux/">Read on &rarr;</a>
     </footer>
   
 
@@ -223,7 +238,7 @@ var _hmt = _hmt || [];
       
   <header>
     
-      <h1 class="entry-title"><a href="/2014/07/05/0012/">0012</a></h1>
+      <h1 class="entry-title"><a href="/2014/01/08/use-tcpcopy-test-online/">使用tcpcopy导入线上流量进行功能和压力测试</a></h1>
     
     
       <p class="meta">
@@ -239,20 +254,24 @@ var _hmt = _hmt || [];
   
 
 
-<time datetime="2014-07-05T13:59:00+08:00" pubdate data-updated="true">Jul 5<span>th</span>, 2014</time>
+<time datetime="2014-01-08T17:29:00+08:00" pubdate data-updated="true">Jan 8<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>从小到大，我最不喜欢的就是离别。但这却是我们每天都要经历的事情，只是或长，或短。</p>
+  <div class="entry-content"><p>假设我们要上线一个两年内不会宕机的先进架构。在上线前，免不了单元测试，功能测试，还有使用ab，webbench等等进行压力测试。</p>
+
+<p>但这些步骤非生产环境下正式用户的行为。或许你会想到灰度上线，但毕竟可能会影响到部分用户，这怎么对得起我们两年内不宕机的承诺呢？</p>
+
+<p>好在网易的 <a href="http://weibo.com/tcpcopy">王斌</a> 开发了<a href="https://github.com/wangbin579/tcpcopy">tcpcopy</a>， 可以导入线上流量进行功能和压力测试。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/2014/07/05/0012/">Read on &rarr;</a>
+      <a rel="full-article" href="/2014/01/08/use-tcpcopy-test-online/">Read on &rarr;</a>
     </footer>
   
 
@@ -264,7 +283,7 @@ var _hmt = _hmt || [];
       
   <header>
     
-      <h1 class="entry-title"><a href="/2014/06/08/manual-update-android-ota-update/">手动刷入android 4.4.3 OTA 更新包</a></h1>
+      <h1 class="entry-title"><a href="/2013/12/18/deploy-sentry-in-product/">在生产环境部署sentry进行错误收集和提醒</a></h1>
     
     
       <p class="meta">
@@ -280,20 +299,20 @@ var _hmt = _hmt || [];
   
 
 
-<time datetime="2014-06-08T06:35:00+08:00" pubdate data-updated="true">Jun 8<span>th</span>, 2014</time>
+<time datetime="2013-12-18T11:10:00+08:00" pubdate data-updated="true">Dec 18<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>今天上午，nexus4终于收到了google android 4.4.3 的ota更新包，但是从上午到晚上，愣是没有下载下来。这就像因为长智齿而牙龈肿痛的你被人请吃麻辣香锅那样难受。</p>
+  <div class="entry-content"><p>Sentry正如其名，是一个实时的日志聚合平台，可以通过捕获程序事件（<code>Error</code>，<code>Exception</code>），或者主动上报的方式将错误信息等进行收集汇总和提醒，以帮助我们及时发现项目中的问题。</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/2014/06/08/manual-update-android-ota-update/">Read on &rarr;</a>
+      <a rel="full-article" href="/2013/12/18/deploy-sentry-in-product/">Read on &rarr;</a>
     </footer>
   
 
@@ -321,12 +340,10 @@ var _hmt = _hmt || [];
 <section>
   <h1>Categories</h1>
   <ul id="categories">
-    <li class='category'><a href='/categories/collect/'>collect (6)</a></li>
+    <li class='category'><a href='/categories/collect/'>collect (4)</a></li>
 <li class='category'><a href='/categories/devops/'>devops (9)</a></li>
 <li class='category'><a href='/categories/emacs/'>emacs (1)</a></li>
-<li class='category'><a href='/categories/essay/'>essay (3)</a></li>
 <li class='category'><a href='/categories/linux/'>linux (3)</a></li>
-<li class='category'><a href='/categories/mind/'>mind (4)</a></li>
 <li class='category'><a href='/categories/mobile/'>mobile (3)</a></li>
 <li class='category'><a href='/categories/network/'>network (1)</a></li>
 <li class='category'><a href='/categories/php/'>php (9)</a></li>
@@ -346,10 +363,6 @@ var _hmt = _hmt || [];
       </li>
     
       <li class="post">
-        <a href="/2016/12/31/writing-in-2016-of-mine/">我的2016和很多书写体验</a>
-      </li>
-    
-      <li class="post">
         <a href="/2016/11/17/mac-terminal-cross-gfw/">Mac终端穿墙技术汇总</a>
       </li>
     
@@ -357,21 +370,25 @@ var _hmt = _hmt || [];
         <a href="/2016/07/01/charles-https/">使用charles在移动设备上捕获https数据包</a>
       </li>
     
+      <li class="post">
+        <a href="/2015/03/30/does-startup-company-need-backend-development-engineer/">互联网创业公司是否需要后端工程师</a>
+      </li>
+    
   </ul>
 </section>
 <section>
   <h1>Tags</h1>
   <ul class="tag-cloud">
-    <a style="font-size: 128%" href="/tags/collect/">collect</a>
+    <a style="font-size: 90%" href="/tags/android/">android</a>
+<a style="font-size: 90%" href="/tags/codesniffer/">codesniffer</a>
 <a style="font-size: 210%" href="/tags/devops/">devops</a>
-<a style="font-size: 150%" href="/tags/essay/">essay</a>
+<a style="font-size: 90%" href="/tags/emacs/">emacs</a>
 <a style="font-size: 196%" href="/tags/linux/">linux</a>
-<a style="font-size: 166%" href="/tags/mind/">mind</a>
+<a style="font-size: 90%" href="/tags/mac/">mac</a>
 <a style="font-size: 150%" href="/tags/mobile/">mobile</a>
 <a style="font-size: 128%" href="/tags/monitor/">monitor</a>
 <a style="font-size: 188%" href="/tags/php/">php</a>
 <a style="font-size: 166%" href="/tags/php5-dot-5/">php5.5</a>
-<a style="font-size: 128%" href="/tags/web/">web</a>
 
   </ul>
 </section>
@@ -391,7 +408,7 @@ var _hmt = _hmt || [];
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - jqlblue -
+  Copyright &copy; 2019 - jqlblue -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
