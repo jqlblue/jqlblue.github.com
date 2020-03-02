@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: gfw | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/tags/gfw/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:25:03+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[mac终端穿墙技术汇总]]></title>
     <link href="http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw/"/>
-    <updated>2016-11-17T18:32:39+08:00</updated>
+    <updated>2016-11-17T10:32:39+00:00</updated>
     <id>http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw</id>
     <content type="html"><![CDATA[<p>作为一个互联网从业人员，要想在天朝愉快地工作，生活，目前必须正视墙（gfw）的存在。
 本文涉及的翻墙方法，主要针对mac系统。但大部分内容，同样适用于window和linux。也可以自行寻找相关替代品。</p>

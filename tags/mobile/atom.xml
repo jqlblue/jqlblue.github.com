@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: mobile | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/tags/mobile/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:25:03+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -14,9 +14,89 @@
 
   
   <entry>
+    <title type="html"><![CDATA[flutter入坑指南]]></title>
+    <link href="http://jqlblue.github.io/2020/02/28/guide-of-start-using-flutter/"/>
+    <updated>2020-02-28T03:20:00+00:00</updated>
+    <id>http://jqlblue.github.io/2020/02/28/guide-of-start-using-flutter</id>
+    <content type="html"><![CDATA[<p>flutter是google推出的一个开源的ui框架(UI software development kit)，开发者可以使用flutter，通过dart语言来开发跨平台，高保真，高性能的<code>App</code>，目前已经支持的平台有： <code>Android</code>, <code>IOS</code>, <code>Windows</code>, <code>Mac</code>, <code>Linux</code>, <code>Google Fuchsia[5]</code>和 <code>Web</code>。</p>
+
+<!-- more -->
+
+
+<p>flutter的第一个版本(Alpha (v0.0.6))是在2017年5月份发布的。2018年12月4号，google发布了flutter1.0，支持android和ios平台。</p>
+
+<p>ui框架，是一个比较抽象的概念。但是说到移动端跨平台的ui框架，我们可能会联想到<code>Hybrid</code>,<code>React-Native</code>等。所以我们以移动端为例，先尝试解释下ui框架。</p>
+
+<p>如果将移动端的系统架构进行分层，大概如下。
+<img src="/images/flutter/mobile_struct.png" title="mobile os architecture android os ios os struct" ></p>
+
+<p>其中，对ios系统的每层架构进行细分，如下图
+<img src="/images/flutter/mibile_ios_struct_1.png" title="mobile os architecture ios os layer architecture" ></p>
+
+<p>对android系统的每层架构进行细分，如下图
+<img src="/images/flutter/mobile_android_struct.png" title="mobile os architecture android os layer architecture" ></p>
+
+<p>我们在android系统上开发出的apk，或者在ios系统上开发的ipa，主要涉及和平台特有的SDK，以及本地服务（蓝牙，摄像头，传感地，地理位置），与系统的交互如下图：
+<img src="/images/flutter/mobile_native_struct.png" title="mobile os architecture android ios native oem sdk" ></p>
+
+<p>如果要开发一款<code>App</code>，分别支持android平台和ios平台的。这样的话，就需要分别基于android和ios平台上特有的SDK进行开发。一款产品，需要维护两套代码。由于两个平台存在着不同的特性，很难在两个平台上对齐相同的交互体验。</p>
+
+<p>所以后来出现了<code>Hybrid</code>，即混合开发的方案。可以基于IOS平台上的UIWebView和android平台上的WebView，使用HTML，CSS和Javascript进行开发，借助第三方的<code>Hybrid</code>框架，基本可以做到一套代码，多端运行。由于要使用本地的浏览器（UIWebView或WebView）进行渲染，还要使用第三方<code>Hybrid</code>框架提供的BRIDGE，与本地服务进行通信，所以性能会比较差。
+<img src="/images/flutter/mobile_hybrid_struct.png" title="mobile os architecture android ios Hybrid" ></p>
+
+<p>在后来就出现了<code>React-Native</code>等跨平台的方案，可以通过js-bridge与OEM组件，以及本地服务进行通信，较<code>Hybrid</code>的方案，可以带来更好的用户体验。
+<img src="/images/flutter/mobile_cross_platform_struct.png" title="mobile os architecture android ios Cross-Platform REACT NATIVE" ></p>
+
+<p>到这里，我们再次回归到本文的重点，flutter的方案，如下图：
+<img src="/images/flutter/mobile_flutter_struct.png" title="mobile os architecture android ios flutter" ></p>
+
+<p>flutter并不会直接编译成ios或者android应用程序。基于flutter开发的应用程序，包括两部分：</p>
+
+<pre><code>Dart业务代码
+Flutter引擎代码
+</code></pre>
+
+<p>业务代码会经过frontend_server，gen_snapshot，xcrun，ninja编译工具，转换为具体相应系统架构（arm/arm64等）的二进制指令。相关编译产物如下：
+<img src="/images/flutter/mobile_flutter_struct_4.png" title="flutter编译产物" ></p>
+
+<p>以android平台为例，基于flutter开发的应用程序的启动流程如下：
+<img src="/images/flutter/mobile_flutter_struct_5.png" title="flutter应用程序启动流程" ></p>
+
+<pre><code>Flutter Application会通过onCreate完成初始化配置，加载引擎libflutter.so，注册JNI方法
+
+然后调用Flutter Activity的onCreate，通过FlutterJNI的AttachJNI()方法来初始化引擎Engine，Dart虚拟机，Isolate，taskRunner等对象。
+
+再经过层层处理最终调用main.dart中main()方法，执行runApp(Widget app)来处理整个Dart业务代码。
+</code></pre>
+
+<p>由于flutter使用自渲染引擎，不使用WebView和平台的原生控件，所以不仅保证了多个平台上ui的一致性，也保证高性能。flutter的技术架构如下
+<img src="/images/flutter/mobile_flutter_struct_2.png" title="flutter应用程序技术架构" ></p>
+
+<p>通过Dart Framework层来统一Flutter C++引擎和Web引擎，最终就可以运行在Android，iOS，Browser上。</p>
+
+<p>要开始使用flutter的话，非常方便。在flutter官网，可以选择不同平台，根据官网的指南进行安装，非常easy。</p>
+
+<pre><code>https://flutter.dev/docs/get-started/install
+</code></pre>
+
+<p>reference：</p>
+
+<p>[^1] <a href="https://book.flutterchina.club/chapter1/flutter_intro.html">https://book.flutterchina.club/chapter1/flutter_intro.html</a></p>
+
+<p>[^2] <a href="https://flutter.dev/">https://flutter.dev/</a></p>
+
+<p>[^3] <a href="http://gityuan.com/flutter/">http://gityuan.com/flutter/</a></p>
+
+<p>[^4] <a href="https://www.intellectsoft.net/blog/mobile-app-architecture/">https://www.intellectsoft.net/blog/mobile-app-architecture/</a></p>
+
+<p>[^5] <a href="https://tech.meituan.com/2018/08/09/waimai-flutter-practice.html">https://tech.meituan.com/2018/08/09/waimai-flutter-practice.html</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[手动刷入android 4.4.3 OTA 更新包]]></title>
     <link href="http://jqlblue.github.io/2014/06/08/manual-update-android-ota-update/"/>
-    <updated>2014-06-08T06:35:00+08:00</updated>
+    <updated>2014-06-08T06:35:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/06/08/manual-update-android-ota-update</id>
     <content type="html"><![CDATA[<p>今天上午，nexus4终于收到了google android 4.4.3 的ota更新包，但是从上午到晚上，愣是没有下载下来。这就像因为长智齿而牙龈肿痛的你被人请吃麻辣香锅那样难受。</p>
 
@@ -41,7 +121,7 @@
 <blockquote><p>如何设置可参见博文<a href="http://jqlblue.github.io/2013/08/04/guide-of-packet-mobile-capture/">移动应用无线抓包指南</a>”</p></blockquote>
 
 <p>设置完成后，再请求时发现更新包的无法下载。
-{% img /images/mobile/android-4.4.3-update.png android-4.4.3-update %}</p>
+<img src="/images/mobile/android-4.4.3-update.png" title="android-4.4.3-update" ></p>
 
 <p>这时有两种方案：</p>
 
@@ -77,7 +157,7 @@
 
 <p>手机上应该会出现如下画面。选择<code>允许</code></p>
 
-<p>{% img /images/mobile/android-usb-debug.png 安卓usb调试 %}</p>
+<p><img src="/images/mobile/android-usb-debug.png" title="安卓usb调试" ></p>
 
 <p>使用usb连接手机后，电脑上可能会自动安装相关驱动程序，请耐心等待完成。</p>
 
@@ -99,7 +179,7 @@ adb.exe devices
 
 <p>如果看到下图，说明准备工作告一段落。如果没有，可能是相关驱动安装地有问题，可自行查阅解决。</p>
 
-<p>{% img /images/mobile/android-adb-devices.png 安卓adb devices %}</p>
+<p><img src="/images/mobile/android-adb-devices.png" title="安卓adb devices" ></p>
 
 <h2>开刷</h2>
 
@@ -108,18 +188,18 @@ adb.exe devices
 </ul>
 
 
-<p>{% img /images/mobile/android-fastboot.png 安卓fastboot %}</p>
+<p><img src="/images/mobile/android-fastboot.png" title="安卓fastboot" ></p>
 
 <ul>
 <li>通过按<code>音量上下键</code>进行切换，切换到<code>Recovery Mode</code>模式，按<code>电源键</code>选择进入：</li>
 </ul>
 
 
-<p>{% img /images/mobile/android-recovery-mode.png 安卓recovery-mode %}</p>
+<p><img src="/images/mobile/android-recovery-mode.png" title="安卓recovery-mode" ></p>
 
 <p>此时，你可以看到一个倒地的机器人：</p>
 
-<p>{% img /images/mobile/android-recovery-mode-2.png 安卓recovery-mode %}</p>
+<p><img src="/images/mobile/android-recovery-mode-2.png" title="安卓recovery-mode" ></p>
 
 <ul>
 <li>按<code>电源键</code>，然后再迅速按<code>音量上键</code></li>
@@ -130,11 +210,11 @@ adb.exe devices
 
 <p>直到看到如下界面：</p>
 
-<p>{% img /images/mobile/android-apply-update.png 安卓adb update %}</p>
+<p><img src="/images/mobile/android-apply-update.png" title="安卓adb update" ></p>
 
 <p>再按<code>音量上下键</code>进行切换，切换到<code>apply update from ADB</code>，按<code>电源键</code>选择进入：</p>
 
-<p>{% img /images/mobile/android-sideload.png 安卓sideload %}</p>
+<p><img src="/images/mobile/android-sideload.png" title="安卓sideload" ></p>
 
 <ul>
 <li>通过USB再次连接电脑和手机</li>
@@ -146,26 +226,26 @@ adb.exe devices
 <pre><code>adb.exe sideload kitkat-4.4.3.zip
 </code></pre>
 
-<p>{% img /images/mobile/android-adb-sideload.png 安卓 adb sideload %}</p>
+<p><img src="/images/mobile/android-adb-sideload.png" title="安卓 adb sideload" ></p>
 
 <p>手机上将会出现如下界面：</p>
 
-<p>{% img /images/mobile/android-update-ota-1.png 安卓 ota update %}</p>
+<p><img src="/images/mobile/android-update-ota-1.png" title="安卓 ota update" ></p>
 
 <p>耐心等待，等ota更新包安装完成时，会出现如下界面，按<code>电源键</code>选择重启即可。</p>
 
-<p>{% img /images/mobile/android-update-ota-2.png 安卓 ota update %}</p>
+<p><img src="/images/mobile/android-update-ota-2.png" title="安卓 ota update" ></p>
 
 <p>重启后，会对已安装的应用进行优化。通过<code>设置</code>，<code>关于手机</code>查看系统版本，发现已经是<code>4.4.3</code>。</p>
 
-<p>{% img /images/mobile/android-4.4.3-update-end.jpg  安卓 ota 更新完成 %}</p>
+<p><img src="/images/mobile/android-4.4.3-update-end.jpg" title="安卓 ota 更新完成" ></p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[初探android应用性能分析]]></title>
     <link href="http://jqlblue.github.io/2013/11/22/android-app-profile-tools/"/>
-    <updated>2013-11-22T18:03:00+08:00</updated>
+    <updated>2013-11-22T18:03:00+00:00</updated>
     <id>http://jqlblue.github.io/2013/11/22/android-app-profile-tools</id>
     <content type="html"><![CDATA[<p>如果一个android应用打开时比较慢，或者使用起来比较卡。这个可能是客户端代码有待优化，也可能是服务端性能比较挫。对一个客户端开发者而言，在客户端代码中增加相关debug日志，即可比较准确地定位问题。但这活要落到一个服务端开发人员手里，要怎么办？</p>
 
@@ -215,7 +295,7 @@ classes.dex: Dalvik dex file version 035
 
 <h5>android平台架构</h5>
 
-<p>{% img /images/mobile/android_architecture.png &lsquo;android architecture images&rsquo; %}</p>
+<p><img src="/images/mobile/android_architecture.png" title="&lsquo;android architecture images&rsquo;" ></p>
 
 <p>如上图，android基于linux操作系统，使用linux内核与设备的硬件进行交互。在内核之上，又抽象出了一层，包括Dalvik虚拟机等。</p>
 
@@ -233,7 +313,7 @@ classes.dex: Dalvik dex file version 035
 <h5>apk启动速度</h5>
 
 <p>在分析之前，我们先看看android程序的执行流程
-{% img /images/mobile/android_application_execute_flow.png &lsquo;android application execute flow images&rsquo; %}</p>
+<img src="/images/mobile/android_application_execute_flow.png" title="&lsquo;android application execute flow images&rsquo;" ></p>
 
 <p>如上图，只要获取到启动ActivityManager所需要的时间，即是apk的启动时间。</p>
 
@@ -254,7 +334,7 @@ classes.dex: Dalvik dex file version 035
 <h5>页面渲染性能</h5>
 
 <p>android应用中的页面，是由android系统一帧，一帧地绘制的，其中每一帧的处理如下图：
-{% img /images/mobile/android_view_execute_flow.png &lsquo;android view execute flow images&rsquo; %}</p>
+<img src="/images/mobile/android_view_execute_flow.png" title="&lsquo;android view execute flow images&rsquo;" ></p>
 
 <p>即：
 <code>计算视图大小（measure） -&gt; 安置视图的位置（layout） -&gt; 绘制（draw）视图</code></p>
@@ -288,7 +368,7 @@ classes.dex: Dalvik dex file version 035
 </code></pre>
 
 <p>这时将在终端输出页面渲染时的最后128帧中每帧所花费的时间，将相关数据贴到excel表格中，点击其中的<code>insert</code>&ndash;><code>chart</code>，即可生成相关图表
-{% img /images/mobile/frame_render_time.png &lsquo;frame render time images&rsquo; %}</p>
+<img src="/images/mobile/frame_render_time.png" title="&lsquo;frame render time images&rsquo;" ></p>
 
 <blockquote><p>其中<code>com.sina.weibo</code>就是app的包名</p></blockquote>
 
@@ -310,7 +390,7 @@ python systrace.py --app=com.qihoo.appstore gfx view
 <p>上面这条命令将会在<code>android-sdk-linux/platform-tools/systrace</code>目录下生成<code>trace.html</code>。其中收集了包名为<code>com.qihoo.appstore</code>的应用在android系统上针对<code>gfx</code>和<code>view</code> category的执行数据。</p>
 
 <p><code>trace.html</code>在浏览器中打开如下图：
-{% img /images/mobile/android_systrace_output.png &lsquo;android systrace output images&rsquo; %}</p>
+<img src="/images/mobile/android_systrace_output.png" title="&lsquo;android systrace output images&rsquo;" ></p>
 
 <p>可以使用如下方法，对<code>trace.html</code>进行进一步分析：
 * 通过鼠标点击左侧的<code>+</code>，<code>-</code>可以展开或者收缩相关显示数据
@@ -320,7 +400,7 @@ python systrace.py --app=com.qihoo.appstore gfx view
 * 使用鼠标选择一块内容页面，在下方会显示汇总信息</p>
 
 <p>将光标定位到最后一行，使用<code>w</code>进行放大，使用<code>d</code>向左移动到2260ms左右，如下图：
-{% img /images/mobile/android_systrace_output_zoom.png &lsquo;android systrace output detail images&rsquo; %}</p>
+<img src="/images/mobile/android_systrace_output_zoom.png" title="&lsquo;android systrace output detail images&rsquo;" ></p>
 
 <p>发现对于那些<code>performTraversals</code>处理超过16ms的帧，其中<code>eglSwapBuffers</code>处理的时间都比较长，这应该就是问题所在。</p>
 
@@ -358,7 +438,7 @@ python systrace.py --app=com.qihoo.appstore gfx view
   <entry>
     <title type="html"><![CDATA[移动应用无线抓包指南]]></title>
     <link href="http://jqlblue.github.io/2013/08/04/guide-of-packet-mobile-capture/"/>
-    <updated>2013-08-04T11:41:00+08:00</updated>
+    <updated>2013-08-04T11:41:00+00:00</updated>
     <id>http://jqlblue.github.io/2013/08/04/guide-of-packet-mobile-capture</id>
     <content type="html"><![CDATA[<h3>引子</h3>
 
@@ -448,22 +528,22 @@ fiddle抓包嘛，码农应该都知道</em>）。</p>
   <a href="http://wifi.360.cn/">官网</a>,因为不定期会在京东开启抢购。安装非常简
   单，插入usb接口，就自动创建好无线网络了（目前只支持windows系统）</p>
 
-<p>  {% img /images/360wifi_1.png &lsquo;360 wifi images&rsquo; %}
-  {% img /images/360wifi_2.png &lsquo;360 wifi images&rsquo; %}
-  {% img /images/360wifi_3.png &lsquo;360 wifi images&rsquo; %}</p></li>
+<p>  <img src="/images/360wifi_1.png" title="&lsquo;360 wifi images&rsquo;" >
+  <img src="/images/360wifi_2.png" title="&lsquo;360 wifi images&rsquo;" >
+  <img src="/images/360wifi_3.png" title="&lsquo;360 wifi images&rsquo;" ></p></li>
 <li><p>在电脑上用fiddle设置代理</p>
 
-<p>  {% img /images/360wifi_fiddle.png &lsquo;360 wifiproxy fidlle images&rsquo; %}</p></li>
+<p>  <img src="/images/360wifi_fiddle.png" title="&lsquo;360 wifiproxy fidlle images&rsquo;" ></p></li>
 <li><p>修改手机上的网络设置，并设置代理</p>
 
-<p>  {% img /images/360wifi_proxy_1.png &lsquo;360 wifi mobile network %}
-  {% img /images/360wifi_proxy_2.png '360 wifi mobile network %}
-  {% img /images/360wifi_proxy_3.png '360 wifi mobile network %}</p>
+<p>  <img src="/images/360wifi_proxy_1.png" title="&lsquo;360 wifi mobile network" >
+  <img src="/images/360wifi_proxy_2.png" title="'360 wifi mobile network" >
+  <img src="/images/360wifi_proxy_3.png" title="'360 wifi mobile network" ></p>
 
 <p>  代理服务器的ip可以通过在电脑上查看网络连接获取，代理的端口就是在
   fiddle中设置的"listen on port"</p>
 
-<p>  {% img /images/360wifi_proxy_ip.png &lsquo;360 wifi mobile network %}</p></li>
+<p>  <img src="/images/360wifi_proxy_ip.png" title="&lsquo;360 wifi mobile network" ></p></li>
 </ul>
 
 ]]></content>

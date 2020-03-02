@@ -4,7 +4,7 @@
   <title><![CDATA[Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:24:57+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -14,9 +14,89 @@
 
   
   <entry>
+    <title type="html"><![CDATA[flutter入坑指南]]></title>
+    <link href="http://jqlblue.github.io/2020/02/28/guide-of-start-using-flutter/"/>
+    <updated>2020-02-28T03:20:00+00:00</updated>
+    <id>http://jqlblue.github.io/2020/02/28/guide-of-start-using-flutter</id>
+    <content type="html"><![CDATA[<p>flutter是google推出的一个开源的ui框架(UI software development kit)，开发者可以使用flutter，通过dart语言来开发跨平台，高保真，高性能的<code>App</code>，目前已经支持的平台有： <code>Android</code>, <code>IOS</code>, <code>Windows</code>, <code>Mac</code>, <code>Linux</code>, <code>Google Fuchsia[5]</code>和 <code>Web</code>。</p>
+
+<!-- more -->
+
+
+<p>flutter的第一个版本(Alpha (v0.0.6))是在2017年5月份发布的。2018年12月4号，google发布了flutter1.0，支持android和ios平台。</p>
+
+<p>ui框架，是一个比较抽象的概念。但是说到移动端跨平台的ui框架，我们可能会联想到<code>Hybrid</code>,<code>React-Native</code>等。所以我们以移动端为例，先尝试解释下ui框架。</p>
+
+<p>如果将移动端的系统架构进行分层，大概如下。
+<img src="http://jqlblue.github.io/images/flutter/mobile_struct.png" title="mobile os architecture android os ios os struct" ></p>
+
+<p>其中，对ios系统的每层架构进行细分，如下图
+<img src="http://jqlblue.github.io/images/flutter/mibile_ios_struct_1.png" title="mobile os architecture ios os layer architecture" ></p>
+
+<p>对android系统的每层架构进行细分，如下图
+<img src="http://jqlblue.github.io/images/flutter/mobile_android_struct.png" title="mobile os architecture android os layer architecture" ></p>
+
+<p>我们在android系统上开发出的apk，或者在ios系统上开发的ipa，主要涉及和平台特有的SDK，以及本地服务（蓝牙，摄像头，传感地，地理位置），与系统的交互如下图：
+<img src="http://jqlblue.github.io/images/flutter/mobile_native_struct.png" title="mobile os architecture android ios native oem sdk" ></p>
+
+<p>如果要开发一款<code>App</code>，分别支持android平台和ios平台的。这样的话，就需要分别基于android和ios平台上特有的SDK进行开发。一款产品，需要维护两套代码。由于两个平台存在着不同的特性，很难在两个平台上对齐相同的交互体验。</p>
+
+<p>所以后来出现了<code>Hybrid</code>，即混合开发的方案。可以基于IOS平台上的UIWebView和android平台上的WebView，使用HTML，CSS和Javascript进行开发，借助第三方的<code>Hybrid</code>框架，基本可以做到一套代码，多端运行。由于要使用本地的浏览器（UIWebView或WebView）进行渲染，还要使用第三方<code>Hybrid</code>框架提供的BRIDGE，与本地服务进行通信，所以性能会比较差。
+<img src="http://jqlblue.github.io/images/flutter/mobile_hybrid_struct.png" title="mobile os architecture android ios Hybrid" ></p>
+
+<p>在后来就出现了<code>React-Native</code>等跨平台的方案，可以通过js-bridge与OEM组件，以及本地服务进行通信，较<code>Hybrid</code>的方案，可以带来更好的用户体验。
+<img src="http://jqlblue.github.io/images/flutter/mobile_cross_platform_struct.png" title="mobile os architecture android ios Cross-Platform REACT NATIVE" ></p>
+
+<p>到这里，我们再次回归到本文的重点，flutter的方案，如下图：
+<img src="http://jqlblue.github.io/images/flutter/mobile_flutter_struct.png" title="mobile os architecture android ios flutter" ></p>
+
+<p>flutter并不会直接编译成ios或者android应用程序。基于flutter开发的应用程序，包括两部分：</p>
+
+<pre><code>Dart业务代码
+Flutter引擎代码
+</code></pre>
+
+<p>业务代码会经过frontend_server，gen_snapshot，xcrun，ninja编译工具，转换为具体相应系统架构（arm/arm64等）的二进制指令。相关编译产物如下：
+<img src="http://jqlblue.github.io/images/flutter/mobile_flutter_struct_4.png" title="flutter编译产物" ></p>
+
+<p>以android平台为例，基于flutter开发的应用程序的启动流程如下：
+<img src="http://jqlblue.github.io/images/flutter/mobile_flutter_struct_5.png" title="flutter应用程序启动流程" ></p>
+
+<pre><code>Flutter Application会通过onCreate完成初始化配置，加载引擎libflutter.so，注册JNI方法
+
+然后调用Flutter Activity的onCreate，通过FlutterJNI的AttachJNI()方法来初始化引擎Engine，Dart虚拟机，Isolate，taskRunner等对象。
+
+再经过层层处理最终调用main.dart中main()方法，执行runApp(Widget app)来处理整个Dart业务代码。
+</code></pre>
+
+<p>由于flutter使用自渲染引擎，不使用WebView和平台的原生控件，所以不仅保证了多个平台上ui的一致性，也保证高性能。flutter的技术架构如下
+<img src="http://jqlblue.github.io/images/flutter/mobile_flutter_struct_2.png" title="flutter应用程序技术架构" ></p>
+
+<p>通过Dart Framework层来统一Flutter C++引擎和Web引擎，最终就可以运行在Android，iOS，Browser上。</p>
+
+<p>要开始使用flutter的话，非常方便。在flutter官网，可以选择不同平台，根据官网的指南进行安装，非常easy。</p>
+
+<pre><code>https://flutter.dev/docs/get-started/install
+</code></pre>
+
+<p>reference：</p>
+
+<p>[^1] <a href="https://book.flutterchina.club/chapter1/flutter_intro.html">https://book.flutterchina.club/chapter1/flutter_intro.html</a></p>
+
+<p>[^2] <a href="https://flutter.dev/">https://flutter.dev/</a></p>
+
+<p>[^3] <a href="http://gityuan.com/flutter/">http://gityuan.com/flutter/</a></p>
+
+<p>[^4] <a href="https://www.intellectsoft.net/blog/mobile-app-architecture/">https://www.intellectsoft.net/blog/mobile-app-architecture/</a></p>
+
+<p>[^5] <a href="https://tech.meituan.com/2018/08/09/waimai-flutter-practice.html">https://tech.meituan.com/2018/08/09/waimai-flutter-practice.html</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[基于Opcache发布php项目]]></title>
     <link href="http://jqlblue.github.io/2017/12/14/use-opcache-to-deploy-php/"/>
-    <updated>2017-12-14T11:17:00+08:00</updated>
+    <updated>2017-12-14T11:17:00+00:00</updated>
     <id>http://jqlblue.github.io/2017/12/14/use-opcache-to-deploy-php</id>
     <content type="html"><![CDATA[<p>php的<code>Opcache</code>已经release好多年了，现在基本都是php的标配。最近看到了php创始人<code>Rasmus Lerdorf</code>的一篇<a href="http://talks.php.net/confoo16#/">talk</a>，于是有了使用php的opcache发布代码的想法。</p>
 
@@ -118,7 +198,7 @@ opcache.save_comments=0
   <entry>
     <title type="html"><![CDATA[深入理解双因子认证]]></title>
     <link href="http://jqlblue.github.io/2017/01/05/2fa-a-programmers-perspective/"/>
-    <updated>2017-01-05T12:03:00+08:00</updated>
+    <updated>2017-01-05T12:03:00+00:00</updated>
     <id>http://jqlblue.github.io/2017/01/05/2fa-a-programmers-perspective</id>
     <content type="html"><![CDATA[<p>去年年初，让ops在服务器上开启了基于google-authenticator的双因子认证。最近花了点时间进行深入了解，记录如下。</p>
 
@@ -368,7 +448,7 @@ Do you want to enable rate-limiting (y/n) y
   <entry>
     <title type="html"><![CDATA[mac终端穿墙技术汇总]]></title>
     <link href="http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw/"/>
-    <updated>2016-11-17T18:32:39+08:00</updated>
+    <updated>2016-11-17T10:32:39+00:00</updated>
     <id>http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw</id>
     <content type="html"><![CDATA[<p>作为一个互联网从业人员，要想在天朝愉快地工作，生活，目前必须正视墙（gfw）的存在。
 本文涉及的翻墙方法，主要针对mac系统。但大部分内容，同样适用于window和linux。也可以自行寻找相关替代品。</p>
@@ -486,9 +566,9 @@ ssserver -c /etc/shadowsocks.json -d stop
   
   <entry>
     <title type="html"><![CDATA[使用charles在移动设备上捕获https数据包]]></title>
-    <link href="http://jqlblue.github.io/2016/07/01/charles-https/"/>
-    <updated>2016-07-01T00:38:16+08:00</updated>
-    <id>http://jqlblue.github.io/2016/07/01/charles-https</id>
+    <link href="http://jqlblue.github.io/2016/06/30/charles-https/"/>
+    <updated>2016-06-30T16:38:16+00:00</updated>
+    <id>http://jqlblue.github.io/2016/06/30/charles-https</id>
     <content type="html"><![CDATA[<p>对于互联网从业人员而言，掌握抓包，是必备技能。</p>
 
 <!--more-->
@@ -572,7 +652,7 @@ ssserver -c /etc/shadowsocks.json -d stop
   <entry>
     <title type="html"><![CDATA[互联网创业公司是否需要后端工程师]]></title>
     <link href="http://jqlblue.github.io/2015/03/30/does-startup-company-need-backend-development-engineer/"/>
-    <updated>2015-03-30T18:05:00+08:00</updated>
+    <updated>2015-03-30T18:05:00+00:00</updated>
     <id>http://jqlblue.github.io/2015/03/30/does-startup-company-need-backend-development-engineer</id>
     <content type="html"><![CDATA[<p>随着LeanCloud等<code>baas</code>云服务的兴起，对于一个互联网创业公司而言，是否还需要专门的后端工程师？</p>
 
@@ -640,7 +720,7 @@ ssserver -c /etc/shadowsocks.json -d stop
   <entry>
     <title type="html"><![CDATA[那个套模版的，放开你的F5]]></title>
     <link href="http://jqlblue.github.io/2015/02/28/release-f5-for-template-engineer/"/>
-    <updated>2015-02-28T18:29:00+08:00</updated>
+    <updated>2015-02-28T18:29:00+00:00</updated>
     <id>http://jqlblue.github.io/2015/02/28/release-f5-for-template-engineer</id>
     <content type="html"><![CDATA[<p>老江说过：“科学技术是第一生产力”。技术的魅力在于通过改善相关流程或者提供相关工具，对人们的生活进行改善，make live esaier。</p>
 
@@ -709,7 +789,7 @@ livereload浏览器扩展会连接本地的35729端口，当有新消息到来�
   <entry>
     <title type="html"><![CDATA[互联网信息分类方法]]></title>
     <link href="http://jqlblue.github.io/2015/01/25/categorize-web-information/"/>
-    <updated>2015-01-25T19:12:00+08:00</updated>
+    <updated>2015-01-25T19:12:00+00:00</updated>
     <id>http://jqlblue.github.io/2015/01/25/categorize-web-information</id>
     <content type="html"><![CDATA[<p>目前，虽然搜索已经代替分类目录（google颠覆yahoo模式）成为人们获取信息的主要途径，但是没有好的信息分类，再好的搜索也是白搭。只有信息足够格式化，标准化，搜索才有效。即分类提升展示逻辑，搜索输出内容结果。</p>
 
@@ -820,7 +900,7 @@ livereload浏览器扩展会连接本地的35729端口，当有新消息到来�
   <entry>
     <title type="html"><![CDATA[一周打造支付系统]]></title>
     <link href="http://jqlblue.github.io/2014/11/23/build-payment-system-in-one-week/"/>
-    <updated>2014-11-23T14:34:00+08:00</updated>
+    <updated>2014-11-23T14:34:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/11/23/build-payment-system-in-one-week</id>
     <content type="html"><![CDATA[<p>获取食物的最佳方式就是处于食物链的顶端，以捕食该链条之下的所有动植物。不言而喻，搭建处于资金流顶端的支付系统，伴随资金的转移过程，也是积累财富的绝佳手段。</p>
 
@@ -1041,7 +1121,7 @@ notify_url是异步回调，一般用于更新订单状态等等（支付宝有�
   <entry>
     <title type="html"><![CDATA[使用graphite和cabot搭建监控服务]]></title>
     <link href="http://jqlblue.github.io/2014/10/01/use-graphite-and-alter-build-monitor-system/"/>
-    <updated>2014-10-01T09:43:00+08:00</updated>
+    <updated>2014-10-01T09:43:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/10/01/use-graphite-and-alter-build-monitor-system</id>
     <content type="html"><![CDATA[<p>说起监控，我们一般会首先想到<code>zabbix</code>，<code>nagios</code>，<code>ganglia</code>等等。但是对于非<code>ops</code>开发人员而言，这些东西，多多少少让人感到陌生。所以本文将从一个<code>服务端开发人员</code>的视角，介绍如何通过<code>graphite</code>，<code>cabot</code>，加一个<code>shell</code>定时脚本，搭建监控报警服务。</p>
 
@@ -1577,7 +1657,7 @@ celery:    celery -A cabot worker --loglevel=DEBUG -B -c 8 -Ofair
   <entry>
     <title type="html"><![CDATA[电商相关概念整理]]></title>
     <link href="http://jqlblue.github.io/2014/09/22/e-commerce-idea-collection/"/>
-    <updated>2014-09-22T10:24:00+08:00</updated>
+    <updated>2014-09-22T10:24:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/09/22/e-commerce-idea-collection</id>
     <content type="html"><![CDATA[<h2>电子商务模式</h2>
 
@@ -1823,7 +1903,7 @@ celery:    celery -A cabot worker --loglevel=DEBUG -B -c 8 -Ofair
   <entry>
     <title type="html"><![CDATA[在linux服务器之间同步用户账号]]></title>
     <link href="http://jqlblue.github.io/2014/08/02/synchronization-user-account-on-linux/"/>
-    <updated>2014-08-02T17:26:00+08:00</updated>
+    <updated>2014-08-02T17:26:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/08/02/synchronization-user-account-on-linux</id>
     <content type="html"><![CDATA[<p>最近负责运帷的同事离职了，原先由运帷可以一手搞定的事情，分摊到了几个研发同事的身上。但是多人公用一个账号，实在感觉不爽。</p>
 
@@ -1872,7 +1952,7 @@ $ grep jqlblue: /etc/shadow | xargs -I {} ssh -l root -p 22 192.168.1.8 "echo {}
   <entry>
     <title type="html"><![CDATA[手动刷入android 4.4.3 OTA 更新包]]></title>
     <link href="http://jqlblue.github.io/2014/06/08/manual-update-android-ota-update/"/>
-    <updated>2014-06-08T06:35:00+08:00</updated>
+    <updated>2014-06-08T06:35:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/06/08/manual-update-android-ota-update</id>
     <content type="html"><![CDATA[<p>今天上午，nexus4终于收到了google android 4.4.3 的ota更新包，但是从上午到晚上，愣是没有下载下来。这就像因为长智齿而牙龈肿痛的你被人请吃麻辣香锅那样难受。</p>
 
@@ -2021,7 +2101,7 @@ adb.exe devices
   <entry>
     <title type="html"><![CDATA[再话tcpcopy的胞弟gryphon]]></title>
     <link href="http://jqlblue.github.io/2014/05/28/tcpcopy-gryphon-introduction/"/>
-    <updated>2014-05-28T15:57:00+08:00</updated>
+    <updated>2014-05-28T15:57:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/05/28/tcpcopy-gryphon-introduction</id>
     <content type="html"><![CDATA[<p>gryphon是由网易研发，能够模拟千万级别并发用户进行压力测试的一个软件，可用于网络消息推送服务方面的压力测试和传统web服务的压力测试。目前由网易的 <a href="http://weibo.com/tcpcopy">王斌</a>进行维护。更多介绍可参见<a href="https://github.com/wangbin579/gryphon">A powerful tool to simulate millions of concurrent users for loading testing</a></p>
 
@@ -2345,7 +2425,7 @@ default         10.16.14.1      0.0.0.0         UG    0      0        0 eth0
   <entry>
     <title type="html"><![CDATA[一个使用curl请求https资源的问题排查]]></title>
     <link href="http://jqlblue.github.io/2014/05/14/a-trouble-in-request-https-in-curl/"/>
-    <updated>2014-05-14T14:50:00+08:00</updated>
+    <updated>2014-05-14T14:50:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/05/14/a-trouble-in-request-https-in-curl</id>
     <content type="html"><![CDATA[<p>昨天临下班前，应客户端大牛的要求，开发了一个返回下载服务器ip列表的接口，用于在客户端指定host以解决用户下载时遭遇运营商dns劫持的问题。</p>
 
@@ -2474,7 +2554,7 @@ $ curl 'https://x.x.x.x/get_ips' -k
   <entry>
     <title type="html"><![CDATA[php中的单例模式面面观]]></title>
     <link href="http://jqlblue.github.io/2014/04/26/singleton-pattern-in-php/"/>
-    <updated>2014-04-26T20:47:00+08:00</updated>
+    <updated>2014-04-26T20:47:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/04/26/singleton-pattern-in-php</id>
     <content type="html"><![CDATA[<p>最近在面试时发现好多人都喜欢在简历中添加“熟悉各种设计模式”那一项。但也不乏对于最为简单的单例，也仅限于书本上的一点认知，所以扯一扯php中单例模式的几种使用场景。</p>
 
@@ -2943,7 +3023,7 @@ object(Singleton)#2 (0) {
   <entry>
     <title type="html"><![CDATA[如何静态编译php]]></title>
     <link href="http://jqlblue.github.io/2014/04/09/statically-compile-php/"/>
-    <updated>2014-04-09T18:13:00+08:00</updated>
+    <updated>2014-04-09T18:13:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/04/09/statically-compile-php</id>
     <content type="html"><![CDATA[<p>有些时候，我们写了一个php脚本，但是对方的服务器上没有php环境。</p>
 
@@ -3117,7 +3197,7 @@ $ ll -h /usr/local/php5-static/bin/php
   <entry>
     <title type="html"><![CDATA[linux文件系统如何进行文件存取]]></title>
     <link href="http://jqlblue.github.io/2014/03/29/read-wirite-on-linux-file-system/"/>
-    <updated>2014-03-29T13:32:00+08:00</updated>
+    <updated>2014-03-29T13:32:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/03/29/read-wirite-on-linux-file-system</id>
     <content type="html"><![CDATA[<p>乍一看，这个题目好像有点小儿科。</p>
 
@@ -3291,7 +3371,7 @@ $ ll -h /usr/local/php5-static/bin/php
   <entry>
     <title type="html"><![CDATA[在mac系统上使用emacs24打造web开发环境]]></title>
     <link href="http://jqlblue.github.io/2014/02/28/emacs24-on-mac-and-linux/"/>
-    <updated>2014-02-28T14:16:00+08:00</updated>
+    <updated>2014-02-28T14:16:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/02/28/emacs24-on-mac-and-linux</id>
     <content type="html"><![CDATA[<p>Emacs 是一个强大的、可扩展的文本编辑器。不同于vim，它是一个流行的无模式文本编辑器。尤其是当emacs24内置包管理elpa后，使用通过<code>prelude</code>，<code>goblin</code>等，轻松使用emacs打造一个顺手的diy的web开发环境。</p>
 
@@ -3470,7 +3550,7 @@ slime－mode
   <entry>
     <title type="html"><![CDATA[使用tcpcopy导入线上流量进行功能和压力测试]]></title>
     <link href="http://jqlblue.github.io/2014/01/08/use-tcpcopy-test-online/"/>
-    <updated>2014-01-08T17:29:00+08:00</updated>
+    <updated>2014-01-08T17:29:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/01/08/use-tcpcopy-test-online</id>
     <content type="html"><![CDATA[<p>假设我们要上线一个两年内不会宕机的先进架构。在上线前，免不了单元测试，功能测试，还有使用ab，webbench等等进行压力测试。</p>
 
@@ -3608,298 +3688,6 @@ tcpcopy -x 服务器应用端口号-测试服务器ip地址:测试服务器应�
 <p>[^3] <a href="http://hi.baidu.com/yacker/item/e6bd5b287fe5a3f150fd8731">http://hi.baidu.com/yacker/item/e6bd5b287fe5a3f150fd8731</a></p>
 
 <p>[^4] <a href="http://blog.yam.com/hn12303158/article/35207136">http://blog.yam.com/hn12303158/article/35207136</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[在生产环境部署sentry进行错误收集和提醒]]></title>
-    <link href="http://jqlblue.github.io/2013/12/18/deploy-sentry-in-product/"/>
-    <updated>2013-12-18T11:10:00+08:00</updated>
-    <id>http://jqlblue.github.io/2013/12/18/deploy-sentry-in-product</id>
-    <content type="html"><![CDATA[<p>Sentry正如其名，是一个实时的日志聚合平台，可以通过捕获程序事件（<code>Error</code>，<code>Exception</code>），或者主动上报的方式将错误信息等进行收集汇总和提醒，以帮助我们及时发现项目中的问题。</p>
-
-<!-- more -->
-
-
-<p>Sentry Server端是使用python语言开发的，目前有如下平台的客户端sdk：</p>
-
-<p><code>Python</code>，<code>PHP</code>，<code>Ruby</code>，<code>Javascript</code>，<code>Java</code>，<code>Nodejs</code>，<code>IOS</code></p>
-
-<p>项目地址：<a href="https://github.com/getsentry/sentry">https://github.com/getsentry/sentry</a></p>
-
-<p>本文以收集<code>PHP</code>错误为例。</p>
-
-<h3>安装步骤</h3>
-
-<p>Sentry的文档清晰且完善，包括<code>安装</code>，<code>配置</code>，<code>调优</code>以及<code>客户端调用</code>，正式使用之前，建议看看，以加深理解。地址：<a href="http://sentry.readthedocs.org/en/latest/">http://sentry.readthedocs.org/en/latest/</a></p>
-
-<h4>python环境安装</h4>
-
-<p>Sentry需要python2.5以上，本文以<code>python2.7.3</code>为例，使用<code>virtualenv</code>进行环境隔离，使用<code>pip</code>安装需要的包</p>
-
-<figure class='code'><figcaption><span>python2.7.3-install.sh </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> ~
-</span><span class='line'>yum install -y bzip2-devel.x86_64
-</span><span class='line'>yum install -y sqlite-devel.x86_64
-</span><span class='line'>yum install -y readline-devel.x86_64
-</span><span class='line'>wget http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2
-</span><span class='line'>tar jxvf Python-2.7.3.tar.bz2
-</span><span class='line'><span class="nb">cd </span>Python-2.7.3
-</span><span class='line'>./configure --prefix<span class="o">=</span>/usr/local/python2.7.3
-</span><span class='line'>make
-</span><span class='line'>sudo make install
-</span><span class='line'>
-</span><span class='line'>wget https://pypi.python.org/packages/source/d/distribute/distribute-0.6.49.tar.gz --no-check-certificate
-</span><span class='line'>tar zxvf distribute-0.6.49.tar.gz
-</span><span class='line'><span class="nb">cd </span>distribute-0.6.49
-</span><span class='line'>sudo /usr/local/python2.7.3/bin/python setup.py install
-</span><span class='line'>sudo /usr/local/python2.7.3/bin/easy_install virtualenv
-</span><span class='line'>sudo /usr/local/python2.7.3/bin/easy_install -i http://e.pypi.python.org/simple virtualenvwrapper
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>至此，就完成了python2.7.3和pip，以及virtualenv的安装，使用如下命令进行测试</p>
-
-<pre><code>/usr/local/python2.7.3/bin/python
-</code></pre>
-
-<h4>安装Sentry server</h4>
-
-<p>初始化安装目录</p>
-
-<pre><code>mkdir -p /data/server/python-envs
-</code></pre>
-
-<p>添加相关环境变量</p>
-
-<pre><code>vim ~/.bashrc
-</code></pre>
-
-<p>添加：</p>
-
-<pre><code>export WORKON_HOME=/data/server/python-envs
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/python2.7.3/bin/python
-export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/python2.7.3/bin/virtualenv
-source /usr/local/python2.7.3/bin/virtualenvwrapper.sh
-</code></pre>
-
-<p>使环境变量生效</p>
-
-<pre><code>source ~/.bashrc
-</code></pre>
-
-<p>安装Sentry server</p>
-
-<pre><code>mkvirtualenv sentry
-pip install sentry
-pip install sentry[mysql]
-pip install sentry[mysql] --upgrade
-</code></pre>
-
-<p>修改<code>~/.bashrc</code>，添加如下代码，以便登录后自动切换到相关python环境</p>
-
-<pre><code>source /data/server/python-envs/sentry/bin/activate
-</code></pre>
-
-<h3>快速配置</h3>
-
-<p>或许你还没有做好决定，只是想尽快体验下Sentry，在完成上面的安装之后，通过下面三个步骤即可满足你的愿望：</p>
-
-<p>1 初始化配置</p>
-
-<pre><code>sentry init ~/sentry.conf.py
-</code></pre>
-
-<p>2 修改配置</p>
-
-<p>修改初始配置中的如下两项就行</p>
-
-<p><code>SENTRY_WEB_HOST</code>，<code>SENTRY_URL_PREFIX</code>，如：</p>
-
-<pre><code>SENTRY_URL_PREFIX = 'http://10.16.15.1:9000'
-SENTRY_WEB_HOST = '10.16.15.1'
-</code></pre>
-
-<p>3 创建超级管理员帐号，启动server</p>
-
-<pre><code>sentry --config=~/sentry.conf.py upgrade
-sentry --config=~/sentry.conf.py createsuperuser
-sentry --config=~/sentry.conf.py start
-</code></pre>
-
-<p>然后就可以通过url <a href="http://server_host:port">http://server_host:port</a> ，使用创建的帐号登录系统后台，进行项目，帐号等管理，和已收集日志的查看等等</p>
-
-<h3>配置在生产环境中使用</h3>
-
-<h4>Sentry server</h4>
-
-<p><em>我们在生产环境下的使用状况：</em></p>
-
-<ul>
-<li><p>使用<code>mysql</code>作为后端数据存储</p></li>
-<li><p>使用<code>celery</code>任务队列（<code>broker</code>使用<code>redis</code>），处理数据入库，发送邮件提醒等工作</p></li>
-<li><p>同时，使用<code>redis</code>作为<code>Update Buffers</code>，用于将频繁出现的相同事件合并，这在高并发时会相当有用</p></li>
-<li><p>使用<code>memcache</code>作为前端<code>Cache</code>，管理后台通过轮询的访问获取是否有新的事件提醒，使用<code>memcache</code>，可以减轻直接查询数据库的压力</p></li>
-<li><p>使用<code>Udp</code>协议发送并接收相关事件</p></li>
-<li><p>使用<code>Nginx</code>反向代理前端http请求，并使用<code>HttpLimitReqModule</code>限制请求的发送速率</p></li>
-<li><p>使用<code>supervisor</code>管理<code>celery</code>和<code>sentry</code>server</p></li>
-</ul>
-
-
-<p><em>相关安装步骤：</em></p>
-
-<pre><code>pip install redis hiredis nydus
-pip install redis hiredis nydus --upgrade
-pip install python-memcached
-pip install gevent
-pip install eventlet
-pip install supervisor
-</code></pre>
-
-<p><em>初始化配置</em></p>
-
-<pre><code>mkdir -p /data/server/sentry/etc
-sentry init /data/server/sentry/etc/sentry.conf.py
-</code></pre>
-
-<p><em>创建超级管理员帐号</em></p>
-
-<pre><code>sentry --config=/data/server/sentry/etc/sentry.conf.py upgrade
-sentry --config=/data/server/sentry/etc/sentry.conf.py createsuperuser
-</code></pre>
-
-<p><em>初始化supervisor配置</em></p>
-
-<pre><code>echo_supervisord_conf &gt; /data/server/sentry/etc/supervisord.conf
-</code></pre>
-
-<p><em>配置Sentry</em></p>
-
-<p>示例配置请参见 <a href="https://gist.github.com/jqlblue/8018185">https://gist.github.com/jqlblue/8018185</a></p>
-
-<p>修改<code>/data/server/sentry/etc/supervisord.conf</code>，添加：</p>
-
-<pre><code>[program:web]
-command=/data/server/python-envs/sentry/bin/sentry --config=/data/server/sentry/etc/sentry.conf.py start
-process_name=%(program_name)s_%(process_num)02d
-numprocs=3
-numprocs_start=0
-startsecs=5
-startretries=3
-stopsignal=QUIT
-stopwaitsecs=10
-stopasgroup=true
-killasgroup=true
-environment=SENTRY_CONF="/data/server/sentry/etc/sentry.conf.py"
-directory=/data/server/python-envs/sentry/
-
-[program:sentry_udp]
-command=/data/server/python-envs/sentry/bin/sentry --config=/data/server/sentry/etc/sentry.conf.py start udp
-process_name=sentry_udp_server
-numprocs=1
-numprocs_start=0
-startsecs=5
-startretries=3
-stopsignal=QUIT
-stopwaitsecs=10
-stopasgroup=true
-killasgroup=true
-environment=SENTRY_CONF="/data/server/sentry/etc/sentry.conf.py"
-directory=/data/server/python-envs/sentry/
-
-[program:celeryd]
-command=/data/server/python-envs/sentry/bin/sentry celery worker -c 6 -P processes -l WARNING -n worker-%(process_num)02d.worker
-process_name=%(program_name)s_%(process_num)02d
-numprocs=1
-numprocs_start=0
-startsecs=1
-startretries=3
-stopsignal=TERM
-stopwaitsecs=10
-stopasgroup=false
-killasgroup=true
-environment=SENTRY_CONF="/data/server/sentry/etc/sentry.conf.py"
-directory=/data/server/python-envs/sentry/
-</code></pre>
-
-<p><em>管理Sentry server</em></p>
-
-<ul>
-<li>启动superviord</li>
-</ul>
-
-
-<p>执行如下命令，同时，<code>celery</code>，<code>sentry web</code>，<code>sentry udp server</code>也将随之启动</p>
-
-<pre><code>supervisord -c /data/server/sentry/etc/supervisord.conf
-</code></pre>
-
-<ul>
-<li>停止sentry相关server</li>
-</ul>
-
-
-<p>执行如下命令</p>
-
-<pre><code>supervisorctl -c /data/server/sentry/etc/supervisord.conf stop all
-</code></pre>
-
-<ul>
-<li>停止superviord</li>
-</ul>
-
-
-<p>执行如下命令，同时，已启动的<code>centry</code>相关server也将停止</p>
-
-<pre><code>supervisorctl -c /data/server/sentry/etc/supervisord.conf stop all
-</code></pre>
-
-<p><code>supervisor</code>更多使用方法请参见 <a href="http://supervisord.org/">http://supervisord.org/</a></p>
-
-<p><code>nginx</code>配置请参见 <a href="https://gist.github.com/jqlblue/8019629">https://gist.github.com/jqlblue/8019629</a></p>
-
-<h4>Sentry client</h4>
-
-<p>可以通过在程序中<code>registerExceptionHandler</code>和<code>registerErrorHandler</code>将相关信息即时发送至server端。</p>
-
-<p>相关sdk项目地址 <a href="https://github.com/getsentry/raven-php">https://github.com/getsentry/raven-php</a></p>
-
-<p>实例化<code>Raven_Client</code>时使用的<code>DSN</code>中的<code>public:secret</code>可以在使用管理员登录后台后，在<code>项目</code>&ndash;<code>设置</code>下面查看到。示例地址：<a href="http://sentry_host/team_name/project_name/docs/php/">http://sentry_host/team_name/project_name/docs/php/</a></p>
-
-<p>我们采用通过增量读取php error log，使用crontab将错误信息上报。</p>
-
-<p>基于sentry php sdk修改之后的代码地址：<a href="https://gist.github.com/jqlblue/8019312">https://gist.github.com/jqlblue/8019312</a></p>
-
-<p>安装依赖</p>
-
-<pre><code>yum install -y logcheck.noarch
-</code></pre>
-
-<p><code>logcheck</code>中的<code>logtail2</code>用于增量读取日志，<code>flock</code>用于防止定时任务堆积。</p>
-
-<blockquote><p>另外，需要安装php的sockets扩展</p></blockquote>
-
-<p>添加定时任务</p>
-
-<pre><code>* * * * * /usr/bin/flock -xn /tmp/sentry_client.lock /opt/php-5.5.4/bin/php /path/client.php --project=project_name 2&gt;&amp;1 &gt; /dev/null
-</code></pre>
 ]]></content>
   </entry>
   

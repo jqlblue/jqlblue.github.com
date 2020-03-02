@@ -4,7 +4,7 @@
   <title><![CDATA[Category: devops | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/categories/devops/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:25:03+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[深入理解双因子认证]]></title>
     <link href="http://jqlblue.github.io/2017/01/05/2fa-a-programmers-perspective/"/>
-    <updated>2017-01-05T12:03:00+08:00</updated>
+    <updated>2017-01-05T12:03:00+00:00</updated>
     <id>http://jqlblue.github.io/2017/01/05/2fa-a-programmers-perspective</id>
     <content type="html"><![CDATA[<p>去年年初，让ops在服务器上开启了基于google-authenticator的双因子认证。最近花了点时间进行深入了解，记录如下。</p>
 
@@ -52,7 +52,7 @@
 <h1>双因子认证的实现</h1>
 
 <p>双因子认证的流程如下：
-{% img /images/2fa/flow.png Two-factor authentication flow %}</p>
+<img src="/images/2fa/flow.png" title="Two-factor authentication flow" ></p>
 
 <p>认证过程中涉及的token，一般会使用一次性密码(<a href="https://en.wikipedia.org/wiki/One-time_password">One-time password</a>)，相关实现有：</p>
 
@@ -116,19 +116,19 @@ Step 3: 根据前面的Sbits，计算一个HOTP的值，一般为6位数字。
 
 <p>为了更清晰地展示生成过程，用下图表示<code>HS</code>：</p>
 
-<p>{% img /images/2fa/hotp_step1.png Two-factor authentication step1 %}</p>
+<p><img src="/images/2fa/hotp_step1.png" title="Two-factor authentication step1" ></p>
 
 <p>前面的图中包含40个字符，每个字符都占4-bits（有16个可能的值0-15），被分成了20组单独的字符串。</p>
 
 <p>我们先去找<code>HS</code>的低4位（最后一个字符），作为截取字符串的起始位置。在我们的例子里，最后一个字符是<code>a</code>：</p>
 
-<p>{% img /images/2fa/hotp_step2.png Two-factor authentication step2 %}</p>
+<p><img src="/images/2fa/hotp_step2.png" title="Two-factor authentication step2" ></p>
 
 <p>将十六进制的字符<code>a</code>转成十进制数是<code>10</code>。</p>
 
 <p>我们将第1组字符串的偏移量用<code>0</code>表示，以此类推，如下：</p>
 
-<p>{% img /images/2fa/hotp_step3.png Two-factor authentication step3 %}</p>
+<p><img src="/images/2fa/hotp_step3.png" title="Two-factor authentication step3" ></p>
 
 <p>然后，从字符串<code>HS</code>的第<code>10</code>个偏移量开始，截取<code>4</code>组字符串（或者是接下来的31-bits）。</p>
 
@@ -136,7 +136,7 @@ Step 3: 根据前面的Sbits，计算一个HOTP的值，一般为6位数字。
 
 <p>因此，我们通过DT（Dynamic Truncation）处理，将<code>HS</code>转换后得到的字符串是<code>6482b6d3</code>：</p>
 
-<p>{% img /images/2fa/hotp_step4.png Two-factor authentication step4 %}</p>
+<p><img src="/images/2fa/hotp_step4.png" title="Two-factor authentication step4" ></p>
 
 <p>将十六进制的<code>6482b6d3</code>转成十进制数是<code>1686288083</code>。</p>
 
@@ -252,7 +252,7 @@ Do you want to enable rate-limiting (y/n) y
 
 <p>这时，打开手机上的google身份验证器App，输入对应的code，如下：</p>
 
-<p>{% img /images/2fa/google-authenticator.png google 验证器 flow %}</p>
+<p><img src="/images/2fa/google-authenticator.png" title="google 验证器 flow" ></p>
 
 <p>reference：</p>
 
@@ -267,7 +267,7 @@ Do you want to enable rate-limiting (y/n) y
   <entry>
     <title type="html"><![CDATA[mac终端穿墙技术汇总]]></title>
     <link href="http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw/"/>
-    <updated>2016-11-17T18:32:39+08:00</updated>
+    <updated>2016-11-17T10:32:39+00:00</updated>
     <id>http://jqlblue.github.io/2016/11/17/mac-terminal-cross-gfw</id>
     <content type="html"><![CDATA[<p>作为一个互联网从业人员，要想在天朝愉快地工作，生活，目前必须正视墙（gfw）的存在。
 本文涉及的翻墙方法，主要针对mac系统。但大部分内容，同样适用于window和linux。也可以自行寻找相关替代品。</p>
@@ -363,9 +363,9 @@ ssserver -c /etc/shadowsocks.json -d stop
   
   <entry>
     <title type="html"><![CDATA[使用charles在移动设备上捕获https数据包]]></title>
-    <link href="http://jqlblue.github.io/2016/07/01/charles-https/"/>
-    <updated>2016-07-01T00:38:16+08:00</updated>
-    <id>http://jqlblue.github.io/2016/07/01/charles-https</id>
+    <link href="http://jqlblue.github.io/2016/06/30/charles-https/"/>
+    <updated>2016-06-30T16:38:16+00:00</updated>
+    <id>http://jqlblue.github.io/2016/06/30/charles-https</id>
     <content type="html"><![CDATA[<p>对于互联网从业人员而言，掌握抓包，是必备技能。</p>
 
 <!--more-->
@@ -373,7 +373,7 @@ ssserver -c /etc/shadowsocks.json -d stop
 
 <p><code>Charles</code>是一个http代理，工作模式如下图：</p>
 
-<p>{% img /images/mobile/http_proxy.png &lsquo;抓包&rsquo; %}</p>
+<p><img src="/images/mobile/http_proxy.png" title="&lsquo;抓包&rsquo;" ></p>
 
 <p>但是默认只能抓http协议的数据包，要捕获https的数据包，需要进行相关配置。</p>
 
@@ -439,7 +439,7 @@ Port:443
 </ul>
 
 
-<p>{% img /images/mobile/ios_http_proxy.png &lsquo;ios设置代理&rsquo; %}</p>
+<p><img src="/images/mobile/ios_http_proxy.png" title="&lsquo;ios设置代理&rsquo;" ></p>
 
 <p>其中，<code>服务器</code>是安装了<code>Charles</code>软件的电脑的<code>IP</code>，端口是<code>Charles</code> http代理开启的端口。</p>
 ]]></content>
@@ -448,7 +448,7 @@ Port:443
   <entry>
     <title type="html"><![CDATA[使用graphite和cabot搭建监控服务]]></title>
     <link href="http://jqlblue.github.io/2014/10/01/use-graphite-and-alter-build-monitor-system/"/>
-    <updated>2014-10-01T09:43:00+08:00</updated>
+    <updated>2014-10-01T09:43:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/10/01/use-graphite-and-alter-build-monitor-system</id>
     <content type="html"><![CDATA[<p>说起监控，我们一般会首先想到<code>zabbix</code>，<code>nagios</code>，<code>ganglia</code>等等。但是对于非<code>ops</code>开发人员而言，这些东西，多多少少让人感到陌生。所以本文将从一个<code>服务端开发人员</code>的视角，介绍如何通过<code>graphite</code>，<code>cabot</code>，加一个<code>shell</code>定时脚本，搭建监控报警服务。</p>
 
@@ -623,7 +623,7 @@ python manage.py syncdb
 <code>
 uwsgi --http localhost:8085 --master --processes 1 --home /data/server/python-envs/graphite --pythonpath /opt/graphite/webapp/graphite --wsgi-file=/opt/graphite/conf/graphite.wsgi --enable-threads --thunder-lock
 </code>
-{% img /images/graphite/web.jpg graphite web%}</p></li>
+<img src="/images/graphite/web.jpg" title="graphite web" ></p></li>
 </ul>
 
 
@@ -717,11 +717,11 @@ echo -n &ldquo;server.$IDC.$HOST.system.swap_used $SYSTEM_SWAP_USED $TIMESTAMP&r
 echo -n &ldquo;server.$IDC.$HOST.system.disk_used $SYSTEM_DISK_USED $TIMESTAMP&rdquo; > /dev/udp/127.0.0.1/2003
 ```</p>
 
-<p>{% img /images/graphite/data-view.jpg graphite monitor data view %}</p>
+<p><img src="/images/graphite/data-view.jpg" title="graphite monitor data view" ></p>
 
 <p><em>监控数据收集和展示流图</em></p>
 
-<p>{% img /images/graphite/data-flow.jpg graphite monitor data flow %}</p>
+<p><img src="/images/graphite/data-flow.jpg" title="graphite monitor data flow" ></p>
 
 <h1>搭建cabot报警服务</h1>
 
@@ -825,11 +825,11 @@ nohup foreman start 2&gt;&amp;1 &gt; /dev/null &amp;
 </ul>
 
 
-<p>{% img /images/graphite/cabot_service.jpg cabot service %}</p>
+<p><img src="/images/graphite/cabot_service.jpg" title="cabot service" ></p>
 
-<p>{% img /images/graphite/cabot_service_check.jpg cabot service check %}</p>
+<p><img src="/images/graphite/cabot_service_check.jpg" title="cabot service check" ></p>
 
-<p>{% img /images/graphite/cabot_service_check_detail.jpg cabot service check detail %}</p>
+<p><img src="/images/graphite/cabot_service_check_detail.jpg" title="cabot service check detail" ></p>
 
 <p>reference：</p>
 
@@ -844,7 +844,7 @@ nohup foreman start 2&gt;&amp;1 &gt; /dev/null &amp;
   <entry>
     <title type="html"><![CDATA[在linux服务器之间同步用户账号]]></title>
     <link href="http://jqlblue.github.io/2014/08/02/synchronization-user-account-on-linux/"/>
-    <updated>2014-08-02T17:26:00+08:00</updated>
+    <updated>2014-08-02T17:26:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/08/02/synchronization-user-account-on-linux</id>
     <content type="html"><![CDATA[<p>最近负责运帷的同事离职了，原先由运帷可以一手搞定的事情，分摊到了几个研发同事的身上。但是多人公用一个账号，实在感觉不爽。</p>
 

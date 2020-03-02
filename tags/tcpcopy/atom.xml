@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: tcpcopy | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/tags/tcpcopy/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:25:03+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[使用tcpcopy导入线上流量进行功能和压力测试]]></title>
     <link href="http://jqlblue.github.io/2014/01/08/use-tcpcopy-test-online/"/>
-    <updated>2014-01-08T17:29:00+08:00</updated>
+    <updated>2014-01-08T17:29:00+00:00</updated>
     <id>http://jqlblue.github.io/2014/01/08/use-tcpcopy-test-online</id>
     <content type="html"><![CDATA[<p>假设我们要上线一个两年内不会宕机的先进架构。在上线前，免不了单元测试，功能测试，还有使用ab，webbench等等进行压力测试。</p>
 
@@ -48,7 +48,7 @@
 
 <h3>tcpcopy工作流程</h3>
 
-<p>{% img /images/tcpcopy_flow.png &lsquo;tcpcopy flow&rsquo; %}
+<p><img src="/images/tcpcopy_flow.png" title="&lsquo;tcpcopy flow&rsquo;" >
 如上图，tcpcopy拷贝一次流量访问的步骤如下：</p>
 
 <pre><code>①　一个访问到达线上前端机；

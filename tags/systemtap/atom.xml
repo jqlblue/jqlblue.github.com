@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: systemtap | Debug Hacks]]></title>
   <link href="http://jqlblue.github.io/tags/systemtap/atom.xml" rel="self"/>
   <link href="http://jqlblue.github.io/"/>
-  <updated>2019-02-21T13:25:03+08:00</updated>
+  <updated>2020-03-02T11:26:13+00:00</updated>
   <id>http://jqlblue.github.io/</id>
   <author>
     <name><![CDATA[jqlblue]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[an introduction to systemtap]]></title>
     <link href="http://jqlblue.github.io/2013/08/18/an-introduction-to-systemtap/"/>
-    <updated>2013-08-18T10:07:00+08:00</updated>
+    <updated>2013-08-18T10:07:00+00:00</updated>
     <id>http://jqlblue.github.io/2013/08/18/an-introduction-to-systemtap</id>
     <content type="html"><![CDATA[<p>就像它的名字system（系统）tap（窃听），systemtap提供了底层的支持，以简化系统在运行时的信息收集（包括用户态和内核态的信息）。通过对收集到的信息进行分析，可以帮忙我们识别潜在的性能原因和功能问题。</p>
 
